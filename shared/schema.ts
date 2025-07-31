@@ -75,6 +75,35 @@ export const insertProducerSchema = createInsertSchema(producers).omit({
   createdAt: true,
 });
 
+const stringTransform = z.preprocess((val) => {
+  if (val === null || val === undefined) return "";
+  if (typeof val === 'number') {
+    // Check if it's a date serial number from Excel
+    if (val > 40000 && val < 50000) {
+      // Convert Excel date serial to JavaScript date
+      const date = new Date((val - 25569) * 86400 * 1000);
+      return date.toISOString().split('T')[0];
+    }
+    return val.toString();
+  }
+  return String(val);
+}, z.string());
+
+const optionalStringTransform = z.preprocess((val) => {
+  if (val === null || val === undefined || val === "") return undefined;
+  if (typeof val === 'number') {
+    // Check if it's a date serial number from Excel
+    if (val > 40000 && val < 50000) {
+      // Convert Excel date serial to JavaScript date
+      const date = new Date((val - 25569) * 86400 * 1000);
+      return date.toISOString().split('T')[0];
+    }
+    return val.toString();
+  }
+  const stringVal = String(val);
+  return stringVal === "" ? undefined : stringVal;
+}, z.string().optional());
+
 export const insertOrderSchema = createInsertSchema(orders).omit({
   id: true,
   createdAt: true,
@@ -88,6 +117,14 @@ export const insertOrderSchema = createInsertSchema(orders).omit({
   importerName: z.string(),
   clientName: z.string(),
   producerName: z.string().optional(),
+  // Override numeric and date fields to accept any type and transform to strings
+  data: stringTransform,
+  quantidade: stringTransform,
+  precoGuia: optionalStringTransform,
+  totalGuia: optionalStringTransform,
+  embarque: optionalStringTransform,
+  previsao: optionalStringTransform,
+  chegada: optionalStringTransform,
 });
 
 export type Client = typeof clients.$inferSelect;

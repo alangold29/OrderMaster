@@ -166,30 +166,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const referenciaExportador = rowKeys.find(key => key.includes('REFERÊNCIA') && rowKeys.indexOf(key) < rowKeys.indexOf('IMPORTADOR')) || 'REFERÊNCIA';
           const referenciaImportador = rowKeys.find(key => key.includes('REFERÊNCIA') && rowKeys.indexOf(key) > rowKeys.indexOf('IMPORTADOR')) || 'REFERÊNCIA__1';
           
-          const orderData = {
-            pedido: row.PEDIDO || row.pedido || "",
-            data: row.DATA || row.data || "",
-            exporterName: row.EXPORTADOR || row.exportador || "",
-            referenciaExportador: row[referenciaExportador] || row.referenciaExportador || "",
-            importerName: row.IMPORTADOR || row.importador || "",
-            referenciaImportador: row[referenciaImportador] || row.referenciaImportador || "",
-            quantidade: row.QUANTIDADE || row.quantidade || "0",
-            itens: row.ITENS || row.itens || "",
-            precoGuia: row["PREÇO GUIA"] || row.precoGuia || "0",
-            totalGuia: row["TOTAL GUIA"] || row.totalGuia || "0",
-            producerName: row.PRODUTOR || row.produtor || "",
-            clientName: row.CLIENTE || row.cliente || "",
-            etiqueta: row.ETIQUETA || row.etiqueta || "",
-            portoEmbarque: row["PORTO EMBARQUE"] || row.portoEmbarque || "",
-            portoDestino: row["PORTO DESTINO"] || row.portoDestino || "",
-            condicao: row["CONDIÇÃO"] || row.condicao || "",
-            embarque: row.EMBARQUE || row.embarque || "",
-            previsao: row["PREVISÃO"] || row.previsao || "",
-            chegada: row.CHEGADA || row.chegada || "",
-            observacao: row["OBSERVAÇÃO"] || row.observacao || "",
-            situacao: row["SITUAÇÃO"] || row.situacao || "pendente",
-            semana: row.SEMANA || row.semana || "",
+          // Helper function to convert values to strings and handle dates
+          const toString = (value: any) => {
+            if (value === null || value === undefined) return "";
+            if (typeof value === 'number') {
+              // Check if it's a date serial number from Excel
+              if (value > 40000 && value < 50000) {
+                // Convert Excel date serial to JavaScript date
+                const date = new Date((value - 25569) * 86400 * 1000);
+                return date.toISOString().split('T')[0];
+              }
+              return value.toString();
+            }
+            return String(value);
           };
+
+          const orderData = {
+            pedido: toString(row.PEDIDO || row.pedido),
+            data: toString(row.DATA || row.data),
+            exporterName: toString(row.EXPORTADOR || row.exportador),
+            referenciaExportador: toString(row[referenciaExportador] || row.referenciaExportador),
+            importerName: toString(row.IMPORTADOR || row.importador),
+            referenciaImportador: toString(row[referenciaImportador] || row.referenciaImportador),
+            quantidade: toString(row.QUANTIDADE || row.quantidade || "0"),
+            itens: toString(row.ITENS || row.itens),
+            precoGuia: toString(row["PREÇO GUIA"] || row.precoGuia || "0"),
+            totalGuia: toString(row["TOTAL GUIA"] || row.totalGuia || "0"),
+            producerName: toString(row.PRODUTOR || row.produtor),
+            clientName: toString(row.CLIENTE || row.cliente),
+            etiqueta: toString(row.ETIQUETA || row.etiqueta),
+            portoEmbarque: toString(row["PORTO EMBARQUE"] || row.portoEmbarque),
+            portoDestino: toString(row["PORTO DESTINO"] || row.portoDestino),
+            condicao: toString(row["CONDIÇÃO"] || row.condicao),
+            embarque: toString(row.EMBARQUE || row.embarque),
+            previsao: toString(row["PREVISÃO"] || row.previsao),
+            chegada: toString(row.CHEGADA || row.chegada),
+            observacao: toString(row["OBSERVAÇÃO"] || row.observacao),
+            situacao: toString(row["SITUAÇÃO"] || row.situacao) || "pendente",
+            semana: toString(row.SEMANA || row.semana),
+          };
+
 
           const validatedData = insertOrderSchema.parse(orderData);
           const order = await storage.createOrder(validatedData);

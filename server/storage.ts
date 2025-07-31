@@ -209,6 +209,12 @@ export class DatabaseStorage implements IStorage {
       importerId: importer.id,
       clientId: client.id,
       producerId: producer?.id,
+      // Convert empty strings to undefined for optional date and numeric fields
+      embarque: orderData.embarque && orderData.embarque.trim() !== "" ? orderData.embarque : undefined,
+      previsao: orderData.previsao && orderData.previsao.trim() !== "" ? orderData.previsao : undefined,
+      chegada: orderData.chegada && orderData.chegada.trim() !== "" ? orderData.chegada : undefined,
+      precoGuia: orderData.precoGuia && orderData.precoGuia.trim() !== "" ? orderData.precoGuia : undefined,
+      totalGuia: orderData.totalGuia && orderData.totalGuia.trim() !== "" ? orderData.totalGuia : undefined,
     };
     
     // Remove name fields before insert
