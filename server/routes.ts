@@ -141,6 +141,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Financial statistics
+  app.get("/api/stats/financial", async (req, res) => {
+    try {
+      const stats = await storage.getFinancialStats();
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching financial stats:", error);
+      res.status(500).json({ error: "Failed to fetch financial statistics" });
+    }
+  });
+
+  // Recent orders
+  app.get("/api/orders/recent", async (req, res) => {
+    try {
+      const orders = await storage.getRecentOrders();
+      res.json(orders);
+    } catch (error) {
+      console.error("Error fetching recent orders:", error);
+      res.status(500).json({ error: "Failed to fetch recent orders" });
+    }
+  });
+
+  // Upcoming shipments
+  app.get("/api/orders/upcoming-shipments", async (req, res) => {
+    try {
+      const orders = await storage.getUpcomingShipments();
+      res.json(orders);
+    } catch (error) {
+      console.error("Error fetching upcoming shipments:", error);
+      res.status(500).json({ error: "Failed to fetch upcoming shipments" });
+    }
+  });
+
   // Excel/CSV import
   app.post("/api/import/excel", upload.single("file"), async (req, res) => {
     try {

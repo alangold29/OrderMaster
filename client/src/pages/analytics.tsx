@@ -1,0 +1,232 @@
+import { useQuery } from "@tanstack/react-query";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { CalendarDays, DollarSign, Package, TrendingUp, AlertTriangle, Clock } from "lucide-react";
+
+interface OrderStats {
+  total: number;
+  pendente: number;
+  emTransito: number;
+  entregue: number;
+  quitado: number;
+}
+
+interface FinancialStats {
+  totalValue: number;
+  pendingValue: number;
+  paidValue: number;
+  averageOrderValue: number;
+}
+
+interface RecentOrders {
+  id: string;
+  pedido: string;
+  data: string;
+  clientName: string;
+  totalGuia: string;
+  situacao: string;
+  embarque?: string;
+}
+
+export default function Analytics() {
+  const { data: orderStats } = useQuery<OrderStats>({
+    queryKey: ["/api/stats"],
+  });
+
+  const { data: financialStats } = useQuery<FinancialStats>({
+    queryKey: ["/api/stats/financial"],
+  });
+
+  const { data: recentOrders } = useQuery<RecentOrders[]>({
+    queryKey: ["/api/orders/recent"],
+  });
+
+  const { data: upcomingShipments } = useQuery<RecentOrders[]>({
+    queryKey: ["/api/orders/upcoming-shipments"],
+  });
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Dashboard Analítico</h1>
+        <p className="text-muted-foreground">
+          Visão geral dos indicadores principais do negócio
+        </p>
+      </div>
+
+      {/* Estatísticas Principais */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total de Pedidos</CardTitle>
+            <Package className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{orderStats?.total || 0}</div>
+            <p className="text-xs text-muted-foreground">
+              {orderStats?.pendente || 0} pendentes
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Em Trânsito</CardTitle>
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{orderStats?.emTransito || 0}</div>
+            <p className="text-xs text-muted-foreground">
+              {orderStats?.entregue || 0} entregues
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Valor Total</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              R$ {financialStats?.totalValue?.toLocaleString('pt-BR') || '0'}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Média: R$ {financialStats?.averageOrderValue?.toLocaleString('pt-BR') || '0'}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Valor Pendente</CardTitle>
+            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              R$ {financialStats?.pendingValue?.toLocaleString('pt-BR') || '0'}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Quitado: R$ {financialStats?.paidValue?.toLocaleString('pt-BR') || '0'}
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        {/* Pedidos Recentes */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Pedidos Recentes</CardTitle>
+            <CardDescription>
+              Últimos pedidos criados no sistema
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {recentOrders?.slice(0, 5).map((order) => (
+              <div key={order.id} className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">{order.pedido}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {order.clientName} • {new Date(order.data).toLocaleDateString('pt-BR')}
+                  </p>
+                </div>
+                <div className="text-right space-y-1">
+                  <p className="text-sm font-medium">
+                    R$ {parseFloat(order.totalGuia || '0').toLocaleString('pt-BR')}
+                  </p>
+                  <Badge 
+                    variant={
+                      order.situacao === 'quitado' ? 'default' :
+                      order.situacao === 'em-transito' ? 'secondary' : 'outline'
+                    }
+                    className="text-xs"
+                  >
+                    {order.situacao}
+                  </Badge>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        {/* Embarques Próximos */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Embarques Próximos</CardTitle>
+            <CardDescription>
+              Pedidos com embarque programado nos próximos 30 dias
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {upcomingShipments?.slice(0, 5).map((order) => (
+              <div key={order.id} className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">{order.pedido}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {order.clientName}
+                  </p>
+                </div>
+                <div className="text-right space-y-1">
+                  <div className="flex items-center text-xs text-muted-foreground">
+                    <CalendarDays className="h-3 w-3 mr-1" />
+                    {order.embarque ? new Date(order.embarque).toLocaleDateString('pt-BR') : 'Não definido'}
+                  </div>
+                  <Badge variant="outline" className="text-xs">
+                    <Clock className="h-3 w-3 mr-1" />
+                    {order.situacao}
+                  </Badge>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Distribuição por Status */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Distribuição por Status</CardTitle>
+          <CardDescription>
+            Proporção de pedidos por situação atual
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="text-center p-4 bg-blue-50 dark:bg-blue-950 rounded-lg">
+              <div className="text-2xl font-bold text-blue-600">{orderStats?.pendente || 0}</div>
+              <div className="text-sm text-blue-600">Pendente</div>
+              <div className="text-xs text-muted-foreground">
+                {orderStats?.total ? Math.round((orderStats.pendente / orderStats.total) * 100) : 0}%
+              </div>
+            </div>
+            
+            <div className="text-center p-4 bg-yellow-50 dark:bg-yellow-950 rounded-lg">
+              <div className="text-2xl font-bold text-yellow-600">{orderStats?.emTransito || 0}</div>
+              <div className="text-sm text-yellow-600">Em Trânsito</div>
+              <div className="text-xs text-muted-foreground">
+                {orderStats?.total ? Math.round((orderStats.emTransito / orderStats.total) * 100) : 0}%
+              </div>
+            </div>
+            
+            <div className="text-center p-4 bg-green-50 dark:bg-green-950 rounded-lg">
+              <div className="text-2xl font-bold text-green-600">{orderStats?.entregue || 0}</div>
+              <div className="text-sm text-green-600">Entregue</div>
+              <div className="text-xs text-muted-foreground">
+                {orderStats?.total ? Math.round((orderStats.entregue / orderStats.total) * 100) : 0}%
+              </div>
+            </div>
+            
+            <div className="text-center p-4 bg-purple-50 dark:bg-purple-950 rounded-lg">
+              <div className="text-2xl font-bold text-purple-600">{orderStats?.quitado || 0}</div>
+              <div className="text-sm text-purple-600">Quitado</div>
+              <div className="text-xs text-muted-foreground">
+                {orderStats?.total ? Math.round((orderStats.quitado / orderStats.total) * 100) : 0}%
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
