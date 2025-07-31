@@ -79,6 +79,10 @@ export const insertOrderSchema = createInsertSchema(orders).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+  exporterId: true,
+  importerId: true,
+  clientId: true,
+  producerId: true,
 }).extend({
   exporterName: z.string(),
   importerName: z.string(),

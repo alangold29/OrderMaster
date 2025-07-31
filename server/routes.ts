@@ -161,13 +161,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const row = data[i] as any;
           
           // Map Excel columns to our schema
+          // Handle the fact that there are two REFERÊNCIA columns in the Excel
+          const rowKeys = Object.keys(row);
+          const referenciaExportador = rowKeys.find(key => key.includes('REFERÊNCIA') && rowKeys.indexOf(key) < rowKeys.indexOf('IMPORTADOR')) || 'REFERÊNCIA';
+          const referenciaImportador = rowKeys.find(key => key.includes('REFERÊNCIA') && rowKeys.indexOf(key) > rowKeys.indexOf('IMPORTADOR')) || 'REFERÊNCIA__1';
+          
           const orderData = {
             pedido: row.PEDIDO || row.pedido || "",
             data: row.DATA || row.data || "",
             exporterName: row.EXPORTADOR || row.exportador || "",
-            referenciaExportador: row["REFERÊNCIA EXPORTADOR"] || row.referenciaExportador || "",
+            referenciaExportador: row[referenciaExportador] || row.referenciaExportador || "",
             importerName: row.IMPORTADOR || row.importador || "",
-            referenciaImportador: row["REFERÊNCIA IMPORTADOR"] || row.referenciaImportador || "",
+            referenciaImportador: row[referenciaImportador] || row.referenciaImportador || "",
             quantidade: row.QUANTIDADE || row.quantidade || "0",
             itens: row.ITENS || row.itens || "",
             precoGuia: row["PREÇO GUIA"] || row.precoGuia || "0",
@@ -177,12 +182,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
             etiqueta: row.ETIQUETA || row.etiqueta || "",
             portoEmbarque: row["PORTO EMBARQUE"] || row.portoEmbarque || "",
             portoDestino: row["PORTO DESTINO"] || row.portoDestino || "",
-            condicao: row.CONDIÇÃO || row.condicao || "",
+            condicao: row["CONDIÇÃO"] || row.condicao || "",
             embarque: row.EMBARQUE || row.embarque || "",
-            previsao: row.PREVISÃO || row.previsao || "",
+            previsao: row["PREVISÃO"] || row.previsao || "",
             chegada: row.CHEGADA || row.chegada || "",
-            observacao: row.OBSERVAÇÃO || row.observacao || "",
-            situacao: row.SITUAÇÃO || row.situacao || "pendente",
+            observacao: row["OBSERVAÇÃO"] || row.observacao || "",
+            situacao: row["SITUAÇÃO"] || row.situacao || "pendente",
             semana: row.SEMANA || row.semana || "",
           };
 
