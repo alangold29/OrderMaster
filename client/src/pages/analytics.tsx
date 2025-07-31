@@ -38,11 +38,11 @@ export default function Analytics() {
   });
 
   const { data: recentOrders } = useQuery<RecentOrders[]>({
-    queryKey: ["/api/orders/recent"],
+    queryKey: ["/api/analytics/recent-orders"],
   });
 
   const { data: upcomingShipments } = useQuery<RecentOrders[]>({
-    queryKey: ["/api/orders/upcoming-shipments"],
+    queryKey: ["/api/analytics/upcoming-shipments"],
   });
 
   return (

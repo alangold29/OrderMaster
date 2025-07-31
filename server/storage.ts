@@ -409,36 +409,45 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getFinancialStats() {
-    const result = await db.select({
-      totalValue: sum(orders.totalGuia),
-      situacao: orders.situacao,
-    }).from(orders).groupBy(orders.situacao);
+    try {
+      const result = await db.select({
+        totalGuia: orders.totalGuia,
+        situacao: orders.situacao,
+      }).from(orders);
 
-    let totalValue = 0;
-    let pendingValue = 0;
-    let paidValue = 0;
+      let totalValue = 0;
+      let pendingValue = 0;
+      let paidValue = 0;
 
-    for (const row of result) {
-      const value = parseFloat(row.totalValue || '0');
-      totalValue += value;
-      
-      if (row.situacao === 'pendente' || row.situacao === 'em-transito') {
-        pendingValue += value;
-      } else if (row.situacao === 'quitado') {
-        paidValue += value;
+      for (const row of result) {
+        const value = parseFloat(row.totalGuia || '0');
+        totalValue += value;
+        
+        if (row.situacao === 'pendente' || row.situacao === 'em-transito') {
+          pendingValue += value;
+        } else if (row.situacao === 'quitado') {
+          paidValue += value;
+        }
       }
+
+      const totalOrders = result.length;
+      const averageOrderValue = totalOrders > 0 ? totalValue / totalOrders : 0;
+
+      return {
+        totalValue,
+        pendingValue,
+        paidValue,
+        averageOrderValue,
+      };
+    } catch (error) {
+      console.error('Error in getFinancialStats:', error);
+      return {
+        totalValue: 0,
+        pendingValue: 0,
+        paidValue: 0,
+        averageOrderValue: 0,
+      };
     }
-
-    const countResult = await db.select({ count: count() }).from(orders);
-    const totalOrders = countResult[0]?.count || 0;
-    const averageOrderValue = totalOrders > 0 ? totalValue / totalOrders : 0;
-
-    return {
-      totalValue,
-      pendingValue,
-      paidValue,
-      averageOrderValue,
-    };
   }
 
   async getRecentOrders() {

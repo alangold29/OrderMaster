@@ -153,7 +153,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Recent orders
-  app.get("/api/orders/recent", async (req, res) => {
+  app.get("/api/analytics/recent-orders", async (req, res) => {
     try {
       const orders = await storage.getRecentOrders();
       res.json(orders);
@@ -164,7 +164,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Upcoming shipments
-  app.get("/api/orders/upcoming-shipments", async (req, res) => {
+  app.get("/api/analytics/upcoming-shipments", async (req, res) => {
     try {
       const orders = await storage.getUpcomingShipments();
       res.json(orders);
