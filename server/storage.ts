@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/neon-http";
 import { neon } from "@neondatabase/serverless";
-import { eq, like, and, or, desc, asc, count } from "drizzle-orm";
+import { eq, like, and, or, desc, asc, count, sum, isNotNull, gte } from "drizzle-orm";
 import {
   orders,
   clients,
@@ -70,6 +70,16 @@ export interface IStorage {
     entregue: number;
     quitado: number;
   }>;
+  
+  getFinancialStats(): Promise<{
+    totalValue: number;
+    pendingValue: number;
+    paidValue: number;
+    averageOrderValue: number;
+  }>;
+  
+  getRecentOrders(): Promise<any[]>;
+  getUpcomingShipments(): Promise<any[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -396,6 +406,87 @@ export class DatabaseStorage implements IStorage {
     });
     
     return stats;
+  }
+
+  async getFinancialStats() {
+    const result = await db.select({
+      totalValue: sum(orders.totalGuia),
+      situacao: orders.situacao,
+    }).from(orders).groupBy(orders.situacao);
+
+    let totalValue = 0;
+    let pendingValue = 0;
+    let paidValue = 0;
+
+    for (const row of result) {
+      const value = parseFloat(row.totalValue || '0');
+      totalValue += value;
+      
+      if (row.situacao === 'pendente' || row.situacao === 'em-transito') {
+        pendingValue += value;
+      } else if (row.situacao === 'quitado') {
+        paidValue += value;
+      }
+    }
+
+    const countResult = await db.select({ count: count() }).from(orders);
+    const totalOrders = countResult[0]?.count || 0;
+    const averageOrderValue = totalOrders > 0 ? totalValue / totalOrders : 0;
+
+    return {
+      totalValue,
+      pendingValue,
+      paidValue,
+      averageOrderValue,
+    };
+  }
+
+  async getRecentOrders() {
+    const result = await db.select({
+      id: orders.id,
+      pedido: orders.pedido,
+      data: orders.data,
+      totalGuia: orders.totalGuia,
+      situacao: orders.situacao,
+      clientName: clients.name,
+    })
+    .from(orders)
+    .leftJoin(clients, eq(orders.clientId, clients.id))
+    .orderBy(desc(orders.createdAt))
+    .limit(10);
+
+    return result.map(row => ({
+      ...row,
+      clientName: row.clientName || 'Cliente não encontrado'
+    }));
+  }
+
+  async getUpcomingShipments() {
+    const thirtyDaysFromNow = new Date();
+    thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+
+    const result = await db.select({
+      id: orders.id,
+      pedido: orders.pedido,
+      embarque: orders.embarque,
+      situacao: orders.situacao,
+      clientName: clients.name,
+    })
+    .from(orders)
+    .leftJoin(clients, eq(orders.clientId, clients.id))
+    .where(
+      and(
+        isNotNull(orders.embarque),
+        gte(orders.embarque, new Date().toISOString().split('T')[0])
+      )
+    )
+    .orderBy(asc(orders.embarque))
+    .limit(10);
+
+    return result.map(row => ({
+      ...row,
+      clientName: row.clientName || 'Cliente não encontrado'
+    }));
   }
 }
 
