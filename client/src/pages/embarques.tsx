@@ -125,7 +125,7 @@ export default function Embarques() {
                     <SelectValue placeholder="Selecione..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos</SelectItem>
+                    <SelectItem value="todos">Todos</SelectItem>
                     {exporters.map((exporter: any) => (
                       <SelectItem key={exporter.id} value={exporter.id}>
                         {exporter.name}
@@ -142,7 +142,7 @@ export default function Embarques() {
                     <SelectValue placeholder="Selecione..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos</SelectItem>
+                    <SelectItem value="todos">Todos</SelectItem>
                     {importers.map((importer: any) => (
                       <SelectItem key={importer.id} value={importer.id}>
                         {importer.name}
@@ -159,7 +159,7 @@ export default function Embarques() {
                     <SelectValue placeholder="Selecione..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos</SelectItem>
+                    <SelectItem value="todos">Todos</SelectItem>
                     {clients.map((client: any) => (
                       <SelectItem key={client.id} value={client.id}>
                         {client.name}
@@ -176,7 +176,7 @@ export default function Embarques() {
                     <SelectValue placeholder="Selecione..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos</SelectItem>
+                    <SelectItem value="todos">Todos</SelectItem>
                     {producers.map((producer: any) => (
                       <SelectItem key={producer.id} value={producer.id}>
                         {producer.name}
@@ -193,7 +193,7 @@ export default function Embarques() {
                     <SelectValue placeholder="Selecione..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos</SelectItem>
+                    <SelectItem value="todos">Todos</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -214,7 +214,7 @@ export default function Embarques() {
                     <SelectValue placeholder="Selecione..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos</SelectItem>
+                    <SelectItem value="todos">Todos</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -285,7 +285,7 @@ export default function Embarques() {
                     <SelectValue placeholder="Indiferente" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Indiferente</SelectItem>
+                    <SelectItem value="indiferente">Indiferente</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -327,7 +327,7 @@ export default function Embarques() {
                     <SelectValue placeholder="Selecione..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos</SelectItem>
+                    <SelectItem value="todos">Todos</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -339,7 +339,7 @@ export default function Embarques() {
                     <SelectValue placeholder="Selecione..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos</SelectItem>
+                    <SelectItem value="todos">Todos</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -351,7 +351,7 @@ export default function Embarques() {
                     <SelectValue placeholder="Selecione..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos</SelectItem>
+                    <SelectItem value="todos">Todos</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -372,7 +372,7 @@ export default function Embarques() {
                     <SelectValue placeholder="Selecione..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos</SelectItem>
+                    <SelectItem value="todos">Todos</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -401,7 +401,7 @@ export default function Embarques() {
                     <SelectValue placeholder="Selecione..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos</SelectItem>
+                    <SelectItem value="todos">Todos</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -413,7 +413,7 @@ export default function Embarques() {
                     <SelectValue placeholder="Selecione..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos</SelectItem>
+                    <SelectItem value="todos">Todos</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
