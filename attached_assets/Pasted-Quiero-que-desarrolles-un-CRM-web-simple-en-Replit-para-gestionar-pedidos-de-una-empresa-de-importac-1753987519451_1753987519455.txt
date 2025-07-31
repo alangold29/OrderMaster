@@ -1,0 +1,55 @@
+Quiero que desarrolles un CRM web simple en Replit para gestionar pedidos de una empresa de importación y exportación (tipo broker). 
+
+Te voy a adjuntar un archivo Excel con columnas y datos de ejemplo. Ese Excel debe poder importarse para cargar los pedidos históricos. Además, quiero poder agregar nuevos pedidos manualmente desde un formulario con los mismos campos del Excel.
+
+### Requisitos principales:
+1. **Carga inicial de datos**:
+   - Permitir subir un archivo Excel/CSV para importar pedidos históricos.
+   - Los campos están en este orden:
+     PEDIDO, DATA, EXPORTADOR, REFERÊNCIA EXPORTADOR, IMPORTADOR, REFERÊNCIA IMPORTADOR, QUANTIDADE, ITENS, PREÇO GUIA, TOTAL GUIA, PRODUTOR, CLIENTE, ETIQUETA, PORTO EMBARQUE, PORTO DESTINO, CONDIÇÃO, EMBARQUE, PREVISÃO, CHEGADA, OBSERVAÇÃO, SITUAÇÃO, SEMANA.
+   - Guardar los datos en una base de datos (SQLite o Supabase).
+
+2. **Gestión de pedidos**:
+   - Listar todos los pedidos en una tabla con scroll y paginación.
+   - Filtros por: cliente, exportador, importador, productor, situación, puerto, fechas.
+   - Búsqueda por texto (para buscar por nombre, referencia, etc.).
+   - Ordenar por fecha de embarque, fecha de llegada o semana.
+
+3. **Agregar nuevos pedidos**:
+   - Formulario con los mismos campos que el Excel.
+   - Validar campos obligatorios (pedido, cliente, exportador, importador, cantidad, fechas).
+   - Calcular automáticamente el campo “Total Guia” (cantidad × precio).
+   - Guardar el pedido en la base de datos y refrescar la tabla.
+
+4. **Base de datos**:
+   - Crear tablas para: `Pedidos`, `Exportadores`, `Importadores`, `Productores`, `Clientes`.
+   - Relacionar cada pedido con sus entidades correspondientes para evitar duplicidad de nombres.
+   - Si el usuario escribe un exportador/cliente nuevo, debe agregarse automáticamente en la tabla correspondiente.
+
+5. **Interfaz de usuario**:
+   - Usar React con Material UI para un diseño limpio.
+   - Tabla con filtros en la parte superior y botones:
+     - "Importar Excel"
+     - "Nuevo pedido"
+   - Formulario modal para agregar pedidos.
+   - Panel de filtros con selección múltiple y rangos de fecha.
+
+6. **Funcionalidades extra**:
+   - Mostrar totales por cliente/exportador en el dashboard.
+   - Mostrar pedidos por estatus: "Pendiente", "En tránsito", "Entregado", "Quitado".
+   - Soportar edición y eliminación de pedidos.
+
+7. **Tecnología**:
+   - Backend: Python (Flask o FastAPI).
+   - Frontend: React con Material UI.
+   - Base de datos: SQLite (o Supabase si quieres nube).
+   - Lectura de Excel: librerías como `pandas` o `openpyxl` para Python, o `papaparse`/`xlsx` para JavaScript.
+
+### Objetivo:
+Un CRM simple pero funcional para que el usuario pueda:
+- Consultar datos históricos.
+- Filtrar y buscar pedidos fácilmente.
+- Agregar nuevos pedidos.
+- Mantener un registro centralizado de todos los clientes, exportadores e importadores.
+
+Por favor, crea el proyecto con el backend, el frontend y la base de datos listos para ejecutar en Replit.
