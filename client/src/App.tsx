@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { BarChart3, Package, Ship, CreditCard } from "lucide-react";
 import Dashboard from "@/pages/analytics";
 import Pedidos from "@/pages/dashboard";
+import Embarques from "@/pages/embarques";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -70,7 +71,7 @@ function Router() {
         <Switch>
           <Route path="/" component={Dashboard} />
           <Route path="/pedidos" component={Pedidos} />
-          <Route path="/embarques" component={() => <div className="text-center py-20"><h2 className="text-2xl font-semibold text-muted-foreground">Em desenvolvimento</h2><p className="text-muted-foreground mt-2">Página de embarques será implementada em breve</p></div>} />
+          <Route path="/embarques" component={Embarques} />
           <Route path="/contas" component={() => <div className="text-center py-20"><h2 className="text-2xl font-semibold text-muted-foreground">Em desenvolvimento</h2><p className="text-muted-foreground mt-2">Página de contas correntes será implementada em breve</p></div>} />
           <Route component={NotFound} />
         </Switch>
