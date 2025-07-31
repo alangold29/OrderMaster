@@ -215,10 +215,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
+      console.log(`Import completed: ${orders.length} orders imported, ${errors.length} errors`);
       res.json({
         success: true,
         imported: orders.length,
         errors,
+        totalRows: data.length,
         orders,
       });
     } catch (error) {
