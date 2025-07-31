@@ -104,24 +104,25 @@ export default function Embarques() {
             Embarque - Filtro
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {/* Coluna 1 */}
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="pedido-ano">Pedido ou ano:</Label>
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <Label htmlFor="pedido-ano" className="text-sm">Pedido ou ano:</Label>
                 <Input
                   id="pedido-ano"
                   placeholder="(nnnn/aa ou /aa)"
                   value={filters.pedidoOuAno}
                   onChange={(e) => handleFilterChange("pedidoOuAno", e.target.value)}
+                  className="h-8"
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="exportador">Exportador:</Label>
+              <div className="space-y-1">
+                <Label htmlFor="exportador" className="text-sm">Exportador:</Label>
                 <Select value={filters.exportador} onValueChange={(value) => handleFilterChange("exportador", value)}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-8">
                     <SelectValue placeholder="Selecione..." />
                   </SelectTrigger>
                   <SelectContent>
@@ -135,10 +136,10 @@ export default function Embarques() {
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="importador">Importador:</Label>
+              <div className="space-y-1">
+                <Label htmlFor="importador" className="text-sm">Importador:</Label>
                 <Select value={filters.importador} onValueChange={(value) => handleFilterChange("importador", value)}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-8">
                     <SelectValue placeholder="Selecione..." />
                   </SelectTrigger>
                   <SelectContent>
@@ -152,10 +153,10 @@ export default function Embarques() {
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="cliente-final">Cliente Final:</Label>
+              <div className="space-y-1">
+                <Label htmlFor="cliente-final" className="text-sm">Cliente Final:</Label>
                 <Select value={filters.clienteFinal} onValueChange={(value) => handleFilterChange("clienteFinal", value)}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-8">
                     <SelectValue placeholder="Selecione..." />
                   </SelectTrigger>
                   <SelectContent>
@@ -169,10 +170,10 @@ export default function Embarques() {
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="produtor">Produtor:</Label>
+              <div className="space-y-1">
+                <Label htmlFor="produtor" className="text-sm">Produtor:</Label>
                 <Select value={filters.produtor} onValueChange={(value) => handleFilterChange("produtor", value)}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-8">
                     <SelectValue placeholder="Selecione..." />
                   </SelectTrigger>
                   <SelectContent>
@@ -186,10 +187,10 @@ export default function Embarques() {
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="notify">Notify:</Label>
+              <div className="space-y-1">
+                <Label htmlFor="notify" className="text-sm">Notify:</Label>
                 <Select value={filters.notify} onValueChange={(value) => handleFilterChange("notify", value)}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-8">
                     <SelectValue placeholder="Selecione..." />
                   </SelectTrigger>
                   <SelectContent>
@@ -198,19 +199,20 @@ export default function Embarques() {
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="bl-crt-awb">BL/ CRT / AWB:</Label>
+              <div className="space-y-1">
+                <Label htmlFor="bl-crt-awb" className="text-sm">BL/ CRT / AWB:</Label>
                 <Input
                   id="bl-crt-awb"
                   value={filters.blCrtAwb}
                   onChange={(e) => handleFilterChange("blCrtAwb", e.target.value)}
+                  className="h-8"
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="porto-embarque">Porto de embarque:</Label>
+              <div className="space-y-1">
+                <Label htmlFor="porto-embarque" className="text-sm">Porto de embarque:</Label>
                 <Select value={filters.portoEmbarque} onValueChange={(value) => handleFilterChange("portoEmbarque", value)}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-8">
                     <SelectValue placeholder="Selecione..." />
                   </SelectTrigger>
                   <SelectContent>
@@ -221,67 +223,71 @@ export default function Embarques() {
             </div>
 
             {/* Coluna 2 */}
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label>Data do pedido de:</Label>
-                <div className="flex items-center gap-2">
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <Label className="text-sm">Data do pedido de:</Label>
+                <div className="flex items-center gap-1">
                   <Input
                     type="date"
                     value={filters.dataPedidoFrom}
                     onChange={(e) => handleFilterChange("dataPedidoFrom", e.target.value)}
+                    className="h-8 text-xs"
                   />
-                  <span>a</span>
+                  <span className="text-xs">a</span>
                   <Input
                     type="date"
                     value={filters.dataPedidoTo}
                     onChange={(e) => handleFilterChange("dataPedidoTo", e.target.value)}
+                    className="h-8 text-xs"
                   />
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label>Data embarque de:</Label>
-                <div className="flex items-center gap-2">
+              <div className="space-y-1">
+                <Label className="text-sm">Data embarque de:</Label>
+                <div className="flex items-center gap-1">
                   <Input
                     type="date"
                     value={filters.dataEmbarqueFrom}
                     onChange={(e) => handleFilterChange("dataEmbarqueFrom", e.target.value)}
+                    className="h-8 text-xs"
                   />
-                  <span>a</span>
+                  <span className="text-xs">a</span>
                   <Input
                     type="date"
                     value={filters.dataEmbarqueTo}
                     onChange={(e) => handleFilterChange("dataEmbarqueTo", e.target.value)}
+                    className="h-8 text-xs"
                   />
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label>Situação Pedidos:</Label>
+              <div className="space-y-1">
+                <Label className="text-sm">Situação Pedidos:</Label>
                 <RadioGroup 
                   value={filters.situacaoPedidos} 
                   onValueChange={(value) => handleFilterChange("situacaoPedidos", value)}
-                  className="flex gap-4"
+                  className="flex flex-col gap-1"
                 >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="a-desembarcar" id="a-desembarcar" />
-                    <Label htmlFor="a-desembarcar">A desembarcar</Label>
+                  <div className="flex items-center space-x-1">
+                    <RadioGroupItem value="a-desembarcar" id="a-desembarcar" className="h-3 w-3" />
+                    <Label htmlFor="a-desembarcar" className="text-xs">A desembarcar</Label>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="desembarcado" id="desembarcado" />
-                    <Label htmlFor="desembarcado">Desembarcado</Label>
+                  <div className="flex items-center space-x-1">
+                    <RadioGroupItem value="desembarcado" id="desembarcado" className="h-3 w-3" />
+                    <Label htmlFor="desembarcado" className="text-xs">Desembarcado</Label>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="indiferente" id="indiferente" />
-                    <Label htmlFor="indiferente">Indiferente</Label>
+                  <div className="flex items-center space-x-1">
+                    <RadioGroupItem value="indiferente" id="indiferente" className="h-3 w-3" />
+                    <Label htmlFor="indiferente" className="text-xs">Indiferente</Label>
                   </div>
                 </RadioGroup>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="checkpoint">Checkpoint:</Label>
+              <div className="space-y-1">
+                <Label htmlFor="checkpoint" className="text-sm">Checkpoint:</Label>
                 <Select value={filters.checkpoint} onValueChange={(value) => handleFilterChange("checkpoint", value)}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-8">
                     <SelectValue placeholder="Indiferente" />
                   </SelectTrigger>
                   <SelectContent>
@@ -292,38 +298,41 @@ export default function Embarques() {
             </div>
 
             {/* Coluna 3 */}
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="invoice-normal">Invoice Normal ou TH:</Label>
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <Label htmlFor="invoice-normal" className="text-sm">Invoice Normal ou TH:</Label>
                 <Input
                   id="invoice-normal"
                   value={filters.invoiceNormal}
                   onChange={(e) => handleFilterChange("invoiceNormal", e.target.value)}
+                  className="h-8"
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="ref-exportador">Referência Exportador:</Label>
+              <div className="space-y-1">
+                <Label htmlFor="ref-exportador" className="text-sm">Referência Exportador:</Label>
                 <Input
                   id="ref-exportador"
                   value={filters.referenciaExportador}
                   onChange={(e) => handleFilterChange("referenciaExportador", e.target.value)}
+                  className="h-8"
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="ref-importador">Referência Importador:</Label>
+              <div className="space-y-1">
+                <Label htmlFor="ref-importador" className="text-sm">Referência Importador:</Label>
                 <Input
                   id="ref-importador"
                   value={filters.referenciaImportador}
                   onChange={(e) => handleFilterChange("referenciaImportador", e.target.value)}
+                  className="h-8"
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="mercado-interno">Mercado interno:</Label>
+              <div className="space-y-1">
+                <Label htmlFor="mercado-interno" className="text-sm">Mercado interno:</Label>
                 <Select value={filters.mercadoInterno} onValueChange={(value) => handleFilterChange("mercadoInterno", value)}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-8">
                     <SelectValue placeholder="Selecione..." />
                   </SelectTrigger>
                   <SelectContent>
@@ -332,10 +341,10 @@ export default function Embarques() {
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="consignatario">Consignatário:</Label>
+              <div className="space-y-1">
+                <Label htmlFor="consignatario" className="text-sm">Consignatário:</Label>
                 <Select value={filters.consignatario} onValueChange={(value) => handleFilterChange("consignatario", value)}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-8">
                     <SelectValue placeholder="Selecione..." />
                   </SelectTrigger>
                   <SelectContent>
@@ -344,10 +353,10 @@ export default function Embarques() {
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="armador">Armador:</Label>
+              <div className="space-y-1">
+                <Label htmlFor="armador" className="text-sm">Armador:</Label>
                 <Select value={filters.armador} onValueChange={(value) => handleFilterChange("armador", value)}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-8">
                     <SelectValue placeholder="Selecione..." />
                   </SelectTrigger>
                   <SelectContent>
@@ -356,19 +365,20 @@ export default function Embarques() {
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="container">Container:</Label>
+              <div className="space-y-1">
+                <Label htmlFor="container" className="text-sm">Container:</Label>
                 <Input
                   id="container"
                   value={filters.container}
                   onChange={(e) => handleFilterChange("container", e.target.value)}
+                  className="h-8"
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="porto-desembarque">Porto de desembarque:</Label>
+              <div className="space-y-1">
+                <Label htmlFor="porto-desembarque" className="text-sm">Porto de desembarque:</Label>
                 <Select value={filters.portoDesembarque} onValueChange={(value) => handleFilterChange("portoDesembarque", value)}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-8">
                     <SelectValue placeholder="Selecione..." />
                   </SelectTrigger>
                   <SelectContent>
@@ -377,27 +387,29 @@ export default function Embarques() {
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <Label>Data desembarque de:</Label>
-                <div className="flex items-center gap-2">
+              <div className="space-y-1">
+                <Label className="text-sm">Data desembarque de:</Label>
+                <div className="flex items-center gap-1">
                   <Input
                     type="date"
                     value={filters.dataDesembarqueFrom}
                     onChange={(e) => handleFilterChange("dataDesembarqueFrom", e.target.value)}
+                    className="h-8 text-xs"
                   />
-                  <span>a</span>
+                  <span className="text-xs">a</span>
                   <Input
                     type="date"
                     value={filters.dataDesembarqueTo}
                     onChange={(e) => handleFilterChange("dataDesembarqueTo", e.target.value)}
+                    className="h-8 text-xs"
                   />
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="grupo">Grupo:</Label>
+              <div className="space-y-1">
+                <Label htmlFor="grupo" className="text-sm">Grupo:</Label>
                 <Select value={filters.grupo} onValueChange={(value) => handleFilterChange("grupo", value)}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-8">
                     <SelectValue placeholder="Selecione..." />
                   </SelectTrigger>
                   <SelectContent>
@@ -406,10 +418,10 @@ export default function Embarques() {
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="familia">Família:</Label>
+              <div className="space-y-1">
+                <Label htmlFor="familia" className="text-sm">Família:</Label>
                 <Select value={filters.familia} onValueChange={(value) => handleFilterChange("familia", value)}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-8">
                     <SelectValue placeholder="Selecione..." />
                   </SelectTrigger>
                   <SelectContent>
@@ -421,11 +433,12 @@ export default function Embarques() {
           </div>
 
           {/* Botões de ação */}
-          <div className="flex gap-3 pt-4 border-t">
+          <div className="flex gap-3 pt-3 border-t">
             <Button 
               onClick={handleApplyFilters}
-              className="gap-2"
+              className="gap-2 h-8"
               disabled={isFiltering}
+              size="sm"
             >
               <Search className="h-4 w-4" />
               {isFiltering ? "Aplicando..." : "Aplicar Filtro"}
@@ -433,6 +446,8 @@ export default function Embarques() {
             <Button 
               variant="outline" 
               onClick={handleClearFilters}
+              className="h-8"
+              size="sm"
             >
               Limpar Filtros
             </Button>
