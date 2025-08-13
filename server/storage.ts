@@ -47,6 +47,11 @@ export interface IStorage {
     dataEmissaoFim?: string;
     dataEmbarqueInicio?: string;
     dataEmbarqueFim?: string;
+    notify?: string;
+    portoEmbarque?: string;
+    portoDesembarque?: string;
+    blCrtAwb?: string;
+    dataDesembarque?: string;
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
   }): Promise<{ orders: OrderWithRelations[]; total: number }>;
@@ -118,6 +123,11 @@ export class DatabaseStorage implements IStorage {
     dataEmissaoFim?: string;
     dataEmbarqueInicio?: string;
     dataEmbarqueFim?: string;
+    notify?: string;
+    portoEmbarque?: string;
+    portoDesembarque?: string;
+    blCrtAwb?: string;
+    dataDesembarque?: string;
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
   } = {}) {
@@ -207,9 +217,26 @@ export class DatabaseStorage implements IStorage {
       whereConditions.push(
         and(
           gte(orders.dataEmbarqueDe, params.dataEmbarqueInicio),
-          gte(params.dataEmbarqueFim, orders.dataEmbarqueDe)
+          lte(orders.dataEmbarqueDe, params.dataEmbarqueFim)
         )
       );
+    }
+
+    // Additional embarque specific filters
+    if (params.notify) {
+      whereConditions.push(like(orders.notify, `%${params.notify}%`));
+    }
+
+    if (params.portoEmbarque) {
+      whereConditions.push(like(orders.portoEmbarque, `%${params.portoEmbarque}%`));
+    }
+
+    if (params.portoDesembarque) {
+      whereConditions.push(like(orders.portoDestino, `%${params.portoDesembarque}%`));
+    }
+
+    if (params.blCrtAwb) {
+      whereConditions.push(like(orders.blCrtAwb, `%${params.blCrtAwb}%`));
     }
     
     const whereClause = whereConditions.length > 0 ? and(...whereConditions) : undefined;

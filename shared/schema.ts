@@ -60,6 +60,10 @@ export const orders = pgTable("orders", {
   dataEmbarqueDe: date("data_embarque_de"),
   grupo: text("grupo"),
   paisExportador: text("pais_exportador"),
+  // Embarque specific fields
+  notify: text("notify"),
+  blCrtAwb: text("bl_crt_awb"),
+  dataDesembarque: date("data_desembarque"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

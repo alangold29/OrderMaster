@@ -32,6 +32,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         dataEmissaoFim,
         dataEmbarqueInicio,
         dataEmbarqueFim,
+        notify,
+        portoEmbarque,
+        portoDesembarque,
+        blCrtAwb,
+        dataDesembarque,
         sortBy,
         sortOrder,
       } = req.query;
@@ -57,6 +62,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         dataEmissaoFim: dataEmissaoFim as string,
         dataEmbarqueInicio: dataEmbarqueInicio as string,
         dataEmbarqueFim: dataEmbarqueFim as string,
+        notify: notify as string,
+        portoEmbarque: portoEmbarque as string,
+        portoDesembarque: portoDesembarque as string,
+        blCrtAwb: blCrtAwb as string,
+        dataDesembarque: dataDesembarque as string,
         sortBy: sortBy as string,
         sortOrder: sortOrder as 'asc' | 'desc',
       });
