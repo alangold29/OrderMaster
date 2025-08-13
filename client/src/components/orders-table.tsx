@@ -37,19 +37,27 @@ interface OrdersTableProps {
 
 export default function OrdersTable({ filters, onFiltersChange }: OrdersTableProps) {
   const { data, isLoading } = useQuery({
-    queryKey: [
-      "/api/orders",
-      filters.page,
-      10,
-      filters.search,
-      filters.clientId,
-      filters.exporterId,
-      filters.importerId,
-      filters.producerId,
-      filters.situacao,
-      filters.sortBy,
-      filters.sortOrder,
-    ],
+    queryKey: ["orders", filters],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      params.append("page", filters.page.toString());
+      params.append("limit", "10");
+      
+      if (filters.search) params.append("search", filters.search);
+      if (filters.clientId) params.append("clientId", filters.clientId);
+      if (filters.exporterId) params.append("exporterId", filters.exporterId);
+      if (filters.importerId) params.append("importerId", filters.importerId);
+      if (filters.producerId) params.append("producerId", filters.producerId);
+      if (filters.situacao) params.append("situacao", filters.situacao);
+      if (filters.sortBy) params.append("sortBy", filters.sortBy);
+      if (filters.sortOrder) params.append("sortOrder", filters.sortOrder);
+      
+      const response = await fetch(`/api/orders?${params}`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    },
   });
 
   const handleSort = (column: string) => {
