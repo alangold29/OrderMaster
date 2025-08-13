@@ -28,6 +28,18 @@ interface OrdersTableProps {
     importerId: string;
     producerId: string;
     situacao: string;
+    clienteRede: string;
+    representante: string;
+    produto: string;
+    referenciaExportador: string;
+    referenciaImportador: string;
+    clienteFinal: string;
+    grupo: string;
+    paisExportador: string;
+    dataEmissaoInicio: string;
+    dataEmissaoFim: string;
+    dataEmbarqueInicio: string;
+    dataEmbarqueFim: string;
     page: number;
     sortBy: string;
     sortOrder: "asc" | "desc";
@@ -43,20 +55,26 @@ export default function OrdersTable({ filters, onFiltersChange }: OrdersTablePro
       params.append("page", filters.page.toString());
       params.append("limit", "10");
       
-      if (filters.search) params.append("search", filters.search);
-      if (filters.clientId) params.append("clientId", filters.clientId);
-      if (filters.exporterId) params.append("exporterId", filters.exporterId);
-      if (filters.importerId) params.append("importerId", filters.importerId);
-      if (filters.producerId) params.append("producerId", filters.producerId);
-      if (filters.situacao) params.append("situacao", filters.situacao);
-      if (filters.sortBy) params.append("sortBy", filters.sortBy);
-      if (filters.sortOrder) params.append("sortOrder", filters.sortOrder);
+      // Only add non-empty parameters to avoid sending empty strings
+      if (filters.search?.trim()) params.append("search", filters.search);
+      if (filters.clientId?.trim()) params.append("clientId", filters.clientId);
+      if (filters.exporterId?.trim()) params.append("exporterId", filters.exporterId);
+      if (filters.importerId?.trim()) params.append("importerId", filters.importerId);
+      if (filters.producerId?.trim()) params.append("producerId", filters.producerId);
+      if (filters.situacao?.trim()) params.append("situacao", filters.situacao);
+      if (filters.sortBy?.trim()) params.append("sortBy", filters.sortBy);
+      if (filters.sortOrder?.trim()) params.append("sortOrder", filters.sortOrder);
       
-      const response = await fetch(`/api/orders?${params}`);
+      const url = `/api/orders?${params}`;
+      console.log("Fetching URL:", url); // Debug log
+      
+      const response = await fetch(url);
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-      return response.json();
+      const result = await response.json();
+      console.log("API Response:", result); // Debug log
+      return result;
     },
   });
 
