@@ -35,6 +35,18 @@ export interface IStorage {
     importerId?: string;
     producerId?: string;
     situacao?: string;
+    clienteRede?: string;
+    representante?: string;
+    produto?: string;
+    referenciaExportador?: string;
+    referenciaImportador?: string;
+    clienteFinal?: string;
+    grupo?: string;
+    paisExportador?: string;
+    dataEmissaoInicio?: string;
+    dataEmissaoFim?: string;
+    dataEmbarqueInicio?: string;
+    dataEmbarqueFim?: string;
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
   }): Promise<{ orders: OrderWithRelations[]; total: number }>;
@@ -94,6 +106,18 @@ export class DatabaseStorage implements IStorage {
     importerId?: string;
     producerId?: string;
     situacao?: string;
+    clienteRede?: string;
+    representante?: string;
+    produto?: string;
+    referenciaExportador?: string;
+    referenciaImportador?: string;
+    clienteFinal?: string;
+    grupo?: string;
+    paisExportador?: string;
+    dataEmissaoInicio?: string;
+    dataEmissaoFim?: string;
+    dataEmbarqueInicio?: string;
+    dataEmbarqueFim?: string;
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
   } = {}) {
@@ -108,8 +132,12 @@ export class DatabaseStorage implements IStorage {
         or(
           like(orders.pedido, `%${params.search}%`),
           like(orders.itens, `%${params.search}%`),
+          like(orders.produto, `%${params.search}%`),
           like(orders.referenciaExportador, `%${params.search}%`),
-          like(orders.referenciaImportador, `%${params.search}%`)
+          like(orders.referenciaImportador, `%${params.search}%`),
+          like(orders.clienteRede, `%${params.search}%`),
+          like(orders.representante, `%${params.search}%`),
+          like(orders.clienteFinal, `%${params.search}%`)
         )
       );
     }
@@ -133,12 +161,77 @@ export class DatabaseStorage implements IStorage {
     if (params.situacao) {
       whereConditions.push(eq(orders.situacao, params.situacao));
     }
+
+    if (params.clienteRede) {
+      whereConditions.push(like(orders.clienteRede, `%${params.clienteRede}%`));
+    }
+
+    if (params.representante) {
+      whereConditions.push(like(orders.representante, `%${params.representante}%`));
+    }
+
+    if (params.produto) {
+      whereConditions.push(like(orders.produto, `%${params.produto}%`));
+    }
+
+    if (params.referenciaExportador) {
+      whereConditions.push(like(orders.referenciaExportador, `%${params.referenciaExportador}%`));
+    }
+
+    if (params.referenciaImportador) {
+      whereConditions.push(like(orders.referenciaImportador, `%${params.referenciaImportador}%`));
+    }
+
+    if (params.clienteFinal) {
+      whereConditions.push(like(orders.clienteFinal, `%${params.clienteFinal}%`));
+    }
+
+    if (params.grupo) {
+      whereConditions.push(like(orders.grupo, `%${params.grupo}%`));
+    }
+
+    if (params.paisExportador) {
+      whereConditions.push(like(orders.paisExportador, `%${params.paisExportador}%`));
+    }
+
+    if (params.dataEmissaoInicio && params.dataEmissaoFim) {
+      whereConditions.push(
+        and(
+          gte(orders.dataEmissaoPedido, params.dataEmissaoInicio),
+          gte(params.dataEmissaoFim, orders.dataEmissaoPedido)
+        )
+      );
+    }
+
+    if (params.dataEmbarqueInicio && params.dataEmbarqueFim) {
+      whereConditions.push(
+        and(
+          gte(orders.dataEmbarqueDe, params.dataEmbarqueInicio),
+          gte(params.dataEmbarqueFim, orders.dataEmbarqueDe)
+        )
+      );
+    }
     
     const whereClause = whereConditions.length > 0 ? and(...whereConditions) : undefined;
     
     const sortBy = params.sortBy || 'data';
     const sortOrder = params.sortOrder || 'desc';
-    const sortColumn = sortBy === 'pedido' ? orders.pedido : orders.data;
+    
+    let sortColumn;
+    switch (sortBy) {
+      case 'pedido':
+        sortColumn = orders.pedido;
+        break;
+      case 'dataEmissaoPedido':
+        sortColumn = orders.dataEmissaoPedido;
+        break;
+      case 'dataEmbarqueDe':
+        sortColumn = orders.dataEmbarqueDe;
+        break;
+      default:
+        sortColumn = orders.data;
+    }
+    
     const orderBy = sortOrder === 'asc' ? asc(sortColumn) : desc(sortColumn);
     
     const [ordersResult, totalResult] = await Promise.all([
