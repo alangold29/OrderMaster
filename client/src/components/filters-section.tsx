@@ -77,8 +77,8 @@ export default function FiltersSection({ filters, onFiltersChange }: FiltersProp
       dataEmbarqueInicio: "",
       dataEmbarqueFim: "",
       page: 1,
-      sortBy: filters.sortBy,
-      sortOrder: filters.sortOrder,
+      sortBy: "data",
+      sortOrder: "desc",
     });
   };
 
@@ -248,6 +248,27 @@ export default function FiltersSection({ filters, onFiltersChange }: FiltersProp
               ))}
             </SelectContent>
           </Select>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-2 mb-4">
+          <Button 
+            variant="default" 
+            size="sm"
+            className="flex items-center gap-2"
+          >
+            <Search className="h-4 w-4" />
+            Buscar
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={clearAllFilters}
+            className="flex items-center gap-2"
+          >
+            <X className="h-4 w-4" />
+            Limpiar Filtros
+          </Button>
         </div>
 
         {/* Advanced Filters Toggle */}
