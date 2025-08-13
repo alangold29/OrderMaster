@@ -7,16 +7,19 @@ import {
   exporters,
   importers,
   producers,
+  companyUsers,
   type Order,
   type Client,
   type Exporter,
   type Importer,
   type Producer,
+  type CompanyUser,
   type InsertOrder,
   type InsertClient,
   type InsertExporter,
   type InsertImporter,
   type InsertProducer,
+  type InsertCompanyUser,
   type OrderWithRelations,
   type ManualOrder,
 } from "@shared/schema";
@@ -99,6 +102,16 @@ export interface IStorage {
   
   getRecentOrders(): Promise<any[]>;
   getUpcomingShipments(): Promise<any[]>;
+  
+  // Company Users
+  getCompanyUsers(): Promise<CompanyUser[]>;
+  getCompanyUser(id: string): Promise<CompanyUser | undefined>;
+  createCompanyUser(user: InsertCompanyUser): Promise<CompanyUser>;
+  updateCompanyUser(id: string, user: Partial<InsertCompanyUser>): Promise<CompanyUser>;
+  deleteCompanyUser(id: string): Promise<void>;
+  updateUserPermissions(id: string, permissions: Record<string, boolean>): Promise<CompanyUser>;
+  updateUserRole(id: string, role: string): Promise<CompanyUser>;
+  toggleUserActive(id: string): Promise<CompanyUser>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -662,6 +675,76 @@ export class DatabaseStorage implements IStorage {
       ...row,
       clientName: row.clientName || 'Cliente não encontrado'
     }));
+  }
+
+  // Company Users Management
+  async getCompanyUsers(): Promise<CompanyUser[]> {
+    return await db.select().from(companyUsers).orderBy(desc(companyUsers.createdAt));
+  }
+
+  async getCompanyUser(id: string): Promise<CompanyUser | undefined> {
+    const result = await db.select().from(companyUsers).where(eq(companyUsers.id, id));
+    return result[0];
+  }
+
+  async createCompanyUser(user: InsertCompanyUser): Promise<CompanyUser> {
+    const result = await db.insert(companyUsers).values({
+      ...user,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }).returning();
+    return result[0];
+  }
+
+  async updateCompanyUser(id: string, userData: Partial<InsertCompanyUser>): Promise<CompanyUser> {
+    const result = await db.update(companyUsers)
+      .set({
+        ...userData,
+        updatedAt: new Date(),
+      })
+      .where(eq(companyUsers.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteCompanyUser(id: string): Promise<void> {
+    await db.delete(companyUsers).where(eq(companyUsers.id, id));
+  }
+
+  async updateUserPermissions(id: string, permissions: Record<string, boolean>): Promise<CompanyUser> {
+    const result = await db.update(companyUsers)
+      .set({
+        permissions,
+        updatedAt: new Date(),
+      })
+      .where(eq(companyUsers.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async updateUserRole(id: string, role: string): Promise<CompanyUser> {
+    const result = await db.update(companyUsers)
+      .set({
+        role,
+        updatedAt: new Date(),
+      })
+      .where(eq(companyUsers.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async toggleUserActive(id: string): Promise<CompanyUser> {
+    const currentUser = await this.getCompanyUser(id);
+    if (!currentUser) throw new Error('User not found');
+    
+    const result = await db.update(companyUsers)
+      .set({
+        isActive: !currentUser.isActive,
+        updatedAt: new Date(),
+      })
+      .where(eq(companyUsers.id, id))
+      .returning();
+    return result[0];
   }
 }
 

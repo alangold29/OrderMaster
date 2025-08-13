@@ -304,6 +304,94 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Company Users Management Routes
+  app.get("/api/company-users", async (req, res) => {
+    try {
+      const users = await storage.getCompanyUsers();
+      res.json(users);
+    } catch (error) {
+      console.error("Error fetching company users:", error);
+      res.status(500).json({ error: "Failed to fetch company users" });
+    }
+  });
+
+  app.get("/api/company-users/:id", async (req, res) => {
+    try {
+      const user = await storage.getCompanyUser(req.params.id);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      res.json(user);
+    } catch (error) {
+      console.error("Error fetching company user:", error);
+      res.status(500).json({ error: "Failed to fetch company user" });
+    }
+  });
+
+  app.post("/api/company-users", async (req, res) => {
+    try {
+      const userData = req.body;
+      const user = await storage.createCompanyUser(userData);
+      res.status(201).json(user);
+    } catch (error) {
+      console.error("Error creating company user:", error);
+      res.status(500).json({ error: "Failed to create company user" });
+    }
+  });
+
+  app.put("/api/company-users/:id", async (req, res) => {
+    try {
+      const userData = req.body;
+      const user = await storage.updateCompanyUser(req.params.id, userData);
+      res.json(user);
+    } catch (error) {
+      console.error("Error updating company user:", error);
+      res.status(500).json({ error: "Failed to update company user" });
+    }
+  });
+
+  app.delete("/api/company-users/:id", async (req, res) => {
+    try {
+      await storage.deleteCompanyUser(req.params.id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting company user:", error);
+      res.status(500).json({ error: "Failed to delete company user" });
+    }
+  });
+
+  app.patch("/api/company-users/:id/permissions", async (req, res) => {
+    try {
+      const { permissions } = req.body;
+      const user = await storage.updateUserPermissions(req.params.id, permissions);
+      res.json(user);
+    } catch (error) {
+      console.error("Error updating user permissions:", error);
+      res.status(500).json({ error: "Failed to update user permissions" });
+    }
+  });
+
+  app.patch("/api/company-users/:id/role", async (req, res) => {
+    try {
+      const { role } = req.body;
+      const user = await storage.updateUserRole(req.params.id, role);
+      res.json(user);
+    } catch (error) {
+      console.error("Error updating user role:", error);
+      res.status(500).json({ error: "Failed to update user role" });
+    }
+  });
+
+  app.patch("/api/company-users/:id/toggle-active", async (req, res) => {
+    try {
+      const user = await storage.toggleUserActive(req.params.id);
+      res.json(user);
+    } catch (error) {
+      console.error("Error toggling user active status:", error);
+      res.status(500).json({ error: "Failed to toggle user active status" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

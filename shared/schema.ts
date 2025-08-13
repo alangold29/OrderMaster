@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, decimal, integer, date, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, decimal, integer, date, timestamp, boolean, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -178,3 +178,64 @@ export type OrderWithRelations = Order & {
   client: Client;
   producer?: Producer;
 };
+
+// Company Users Management System
+export const companyUsers = pgTable("company_users", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  email: varchar("email").notNull().unique(),
+  name: varchar("name").notNull(),
+  position: varchar("position").notNull(), // cargo/posição
+  role: varchar("role").notNull().default("viewer"), // admin, manager, editor, viewer
+  isActive: boolean("is_active").default(true),
+  permissions: jsonb("permissions").default({}), // specific permissions object
+  lastLogin: timestamp("last_login"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Zod schemas for company users
+export const insertCompanyUserSchema = createInsertSchema(companyUsers).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  lastLogin: true,
+  isActive: true,
+});
+
+// Types
+export type CompanyUser = typeof companyUsers.$inferSelect;
+export type InsertCompanyUser = z.infer<typeof insertCompanyUserSchema>;
+
+// User Roles enum for reference
+export const USER_ROLES = {
+  ADMIN: 'admin',
+  MANAGER: 'manager', 
+  EDITOR: 'editor',
+  VIEWER: 'viewer'
+} as const;
+
+// Permission structure for different areas
+export const PERMISSIONS = {
+  ORDERS: {
+    VIEW: 'orders:view',
+    CREATE: 'orders:create',
+    EDIT: 'orders:edit',
+    DELETE: 'orders:delete',
+    EXPORT: 'orders:export'
+  },
+  USERS: {
+    VIEW: 'users:view',
+    CREATE: 'users:create',
+    EDIT: 'users:edit',
+    DELETE: 'users:delete',
+    MANAGE_PERMISSIONS: 'users:manage_permissions'
+  },
+  REPORTS: {
+    VIEW: 'reports:view',
+    EXPORT: 'reports:export'
+  },
+  SETTINGS: {
+    VIEW: 'settings:view',
+    EDIT: 'settings:edit'
+  }
+} as const;
