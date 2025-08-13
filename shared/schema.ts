@@ -51,6 +51,15 @@ export const orders = pgTable("orders", {
   observacao: text("observacao"),
   situacao: text("situacao").notNull().default("pendente"),
   semana: text("semana"),
+  // Nuevos campos solicitados
+  clienteRede: text("cliente_rede"),
+  representante: text("representante"),
+  produto: text("produto"),
+  dataEmissaoPedido: date("data_emissao_pedido"),
+  clienteFinal: text("cliente_final"),
+  dataEmbarqueDe: date("data_embarque_de"),
+  grupo: text("grupo"),
+  paisExportador: text("pais_exportador"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -125,6 +134,26 @@ export const insertOrderSchema = createInsertSchema(orders).omit({
   embarque: optionalStringTransform,
   previsao: optionalStringTransform,
   chegada: optionalStringTransform,
+  dataEmissaoPedido: optionalStringTransform,
+  dataEmbarqueDe: optionalStringTransform,
+});
+
+// Schema for manual order creation form
+export const manualOrderSchema = z.object({
+  exporterName: z.string().min(1, "Exportador é obrigatório"),
+  importerName: z.string().min(1, "Importador é obrigatório"),
+  clienteRede: z.string().optional(),
+  representante: z.string().optional(),
+  produto: z.string().min(1, "Produto é obrigatório"),
+  dataEmissaoPedido: z.string().min(1, "Data de emissão é obrigatória"),
+  situacao: z.string().min(1, "Situação é obrigatória"),
+  pedido: z.string().min(1, "Pedido ou ano é obrigatório"),
+  referenciaExportador: z.string().optional(),
+  referenciaImportador: z.string().optional(),
+  clienteFinal: z.string().optional(),
+  dataEmbarqueDe: z.string().optional(),
+  grupo: z.string().optional(),
+  paisExportador: z.string().optional(),
 });
 
 export type Client = typeof clients.$inferSelect;
@@ -137,6 +166,7 @@ export type InsertExporter = z.infer<typeof insertExporterSchema>;
 export type InsertImporter = z.infer<typeof insertImporterSchema>;
 export type InsertProducer = z.infer<typeof insertProducerSchema>;
 export type InsertOrder = z.infer<typeof insertOrderSchema>;
+export type ManualOrder = z.infer<typeof manualOrderSchema>;
 
 export type OrderWithRelations = Order & {
   exporter: Exporter;

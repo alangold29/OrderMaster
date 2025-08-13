@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertOrderSchema } from "@shared/schema";
+import { insertOrderSchema, manualOrderSchema, type ManualOrder } from "@shared/schema";
 import multer from "multer";
 import * as XLSX from "xlsx";
 
@@ -59,12 +59,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/orders", async (req, res) => {
     try {
-      const validatedData = insertOrderSchema.parse(req.body);
-      const order = await storage.createOrder(validatedData);
-      res.status(201).json(order);
+      // Check if this is a manual order creation
+      if (req.body.produto && req.body.dataEmissaoPedido) {
+        const validatedData = manualOrderSchema.parse(req.body);
+        const order = await storage.createManualOrder(validatedData);
+        res.status(201).json(order);
+      } else {
+        // Excel import order creation
+        const validatedData = insertOrderSchema.parse(req.body);
+        const order = await storage.createOrder(validatedData);
+        res.status(201).json(order);
+      }
     } catch (error) {
       console.error("Error creating order:", error);
-      res.status(400).json({ error: "Invalid order data" });
+      res.status(400).json({ error: "Invalid order data", details: error.message });
     }
   });
 

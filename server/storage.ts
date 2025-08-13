@@ -18,6 +18,7 @@ import {
   type InsertImporter,
   type InsertProducer,
   type OrderWithRelations,
+  type ManualOrder,
 } from "@shared/schema";
 
 const sql = neon(process.env.DATABASE_URL!);
@@ -39,6 +40,7 @@ export interface IStorage {
   }): Promise<{ orders: OrderWithRelations[]; total: number }>;
   getOrderById(id: string): Promise<OrderWithRelations | undefined>;
   createOrder(order: InsertOrder): Promise<OrderWithRelations>;
+  createManualOrder(order: ManualOrder): Promise<OrderWithRelations>;
   updateOrder(id: string, order: Partial<InsertOrder>): Promise<OrderWithRelations>;
   deleteOrder(id: string): Promise<void>;
   
@@ -241,6 +243,50 @@ export class DatabaseStorage implements IStorage {
       importer,
       client,
       producer,
+    };
+  }
+
+  async createManualOrder(orderData: ManualOrder): Promise<OrderWithRelations> {
+    // Get or create related entities
+    const [exporter, importer] = await Promise.all([
+      this.getOrCreateExporter(orderData.exporterName),
+      this.getOrCreateImporter(orderData.importerName),
+    ]);
+
+    // Create a client based on clienteRede if provided, otherwise use a generic client
+    const clientName = orderData.clienteRede || "Cliente Genérico";
+    const client = await this.getOrCreateClient(clientName);
+    
+    const insertData = {
+      pedido: orderData.pedido,
+      data: orderData.dataEmissaoPedido,
+      exporterId: exporter.id,
+      importerId: importer.id,
+      clientId: client.id,
+      referenciaExportador: orderData.referenciaExportador,
+      referenciaImportador: orderData.referenciaImportador,
+      situacao: orderData.situacao || "pendente",
+      clienteRede: orderData.clienteRede,
+      representante: orderData.representante,
+      produto: orderData.produto,
+      dataEmissaoPedido: orderData.dataEmissaoPedido,
+      clienteFinal: orderData.clienteFinal,
+      dataEmbarqueDe: orderData.dataEmbarqueDe,
+      grupo: orderData.grupo,
+      paisExportador: orderData.paisExportador,
+      // Required fields with default values for manual orders
+      quantidade: "1",
+      itens: orderData.produto,
+    };
+    
+    const [newOrder] = await db.insert(orders).values(insertData).returning();
+    
+    return {
+      ...newOrder,
+      exporter,
+      importer,
+      client,
+      producer: undefined,
     };
   }
 

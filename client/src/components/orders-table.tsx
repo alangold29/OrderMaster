@@ -109,7 +109,7 @@ export default function OrdersTable({ filters, onFiltersChange }: OrdersTablePro
         <Table>
           <TableHeader>
             <TableRow>
-              {[...Array(10)].map((_, i) => (
+              {[...Array(14)].map((_, i) => (
                 <TableHead key={i}>
                   <Skeleton className="h-4 w-20" />
                 </TableHead>
@@ -119,7 +119,7 @@ export default function OrdersTable({ filters, onFiltersChange }: OrdersTablePro
           <TableBody>
             {[...Array(5)].map((_, i) => (
               <TableRow key={i}>
-                {[...Array(10)].map((_, j) => (
+                {[...Array(14)].map((_, j) => (
                   <TableCell key={j}>
                     <Skeleton className="h-4 w-full" />
                   </TableCell>
@@ -146,23 +146,28 @@ export default function OrdersTable({ filters, onFiltersChange }: OrdersTablePro
             <TableRow className="bg-gray-50">
               <TableHead className="cursor-pointer hover:bg-gray-100" onClick={() => handleSort("pedido")}>
                 <div className="flex items-center">
-                  Pedido
+                  Pedido ou ano
                   <ArrowUpDown className="ml-1 h-3 w-3" />
                 </div>
               </TableHead>
-              <TableHead className="cursor-pointer hover:bg-gray-100" onClick={() => handleSort("data")}>
-                <div className="flex items-center">
-                  Data
-                  <ArrowUpDown className="ml-1 h-3 w-3" />
-                </div>
-              </TableHead>
-              <TableHead>Cliente</TableHead>
               <TableHead>Exportador</TableHead>
               <TableHead>Importador</TableHead>
-              <TableHead>Quantidade</TableHead>
-              <TableHead>Total</TableHead>
+              <TableHead>Cliente Rede</TableHead>
+              <TableHead>Representante</TableHead>
+              <TableHead>Produto</TableHead>
+              <TableHead className="cursor-pointer hover:bg-gray-100" onClick={() => handleSort("dataEmissaoPedido")}>
+                <div className="flex items-center">
+                  Data Emissão
+                  <ArrowUpDown className="ml-1 h-3 w-3" />
+                </div>
+              </TableHead>
               <TableHead>Situação</TableHead>
-              <TableHead>Porto Destino</TableHead>
+              <TableHead>Ref. Exportador</TableHead>
+              <TableHead>Ref. Importador</TableHead>
+              <TableHead>Cliente Final</TableHead>
+              <TableHead>Data Embarque</TableHead>
+              <TableHead>Grupo</TableHead>
+              <TableHead>País Exportador</TableHead>
               <TableHead>Ações</TableHead>
             </TableRow>
           </TableHeader>
@@ -171,24 +176,33 @@ export default function OrdersTable({ filters, onFiltersChange }: OrdersTablePro
               <TableRow key={order.id} className="hover:bg-gray-50">
                 <TableCell className="font-medium">{order.pedido}</TableCell>
                 <TableCell className="text-text-secondary">
-                  {formatDate(order.data)}
-                </TableCell>
-                <TableCell>{order.client?.name}</TableCell>
-                <TableCell className="text-text-secondary">
                   {order.exporter?.name}
                 </TableCell>
                 <TableCell className="text-text-secondary">
                   {order.importer?.name}
                 </TableCell>
+                <TableCell>{order.clienteRede || "-"}</TableCell>
                 <TableCell className="text-text-secondary">
-                  {order.quantidade} {order.itens ? `(${order.itens})` : ""}
+                  {order.representante || "-"}
                 </TableCell>
-                <TableCell className="font-medium">
-                  {formatCurrency(order.totalGuia || 0)}
+                <TableCell>{order.produto || order.itens || "-"}</TableCell>
+                <TableCell className="text-text-secondary">
+                  {formatDate(order.dataEmissaoPedido || order.data)}
                 </TableCell>
                 <TableCell>{getStatusBadge(order.situacao)}</TableCell>
                 <TableCell className="text-text-secondary">
-                  {order.portoDestino || "-"}
+                  {order.referenciaExportador || "-"}
+                </TableCell>
+                <TableCell className="text-text-secondary">
+                  {order.referenciaImportador || "-"}
+                </TableCell>
+                <TableCell>{order.clienteFinal || "-"}</TableCell>
+                <TableCell className="text-text-secondary">
+                  {formatDate(order.dataEmbarqueDe)}
+                </TableCell>
+                <TableCell>{order.grupo || "-"}</TableCell>
+                <TableCell className="text-text-secondary">
+                  {order.paisExportador || "-"}
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center space-x-2">
@@ -212,7 +226,7 @@ export default function OrdersTable({ filters, onFiltersChange }: OrdersTablePro
             ))}
             {orders.length === 0 && (
               <TableRow>
-                <TableCell colSpan={10} className="text-center py-8 text-text-secondary">
+                <TableCell colSpan={15} className="text-center py-8 text-text-secondary">
                   Nenhum pedido encontrado
                 </TableCell>
               </TableRow>
