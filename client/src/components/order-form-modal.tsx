@@ -183,20 +183,9 @@ export default function OrderFormModal({ isOpen, onClose }: OrderFormModalProps)
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Exportador *</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione um exportador..." />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {exporters?.map((exporter: any) => (
-                          <SelectItem key={exporter.id} value={exporter.name}>
-                            {exporter.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <Input placeholder="Digite ou selecione um exportador..." {...field} />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -208,20 +197,9 @@ export default function OrderFormModal({ isOpen, onClose }: OrderFormModalProps)
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Importador *</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione um importador..." />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {importers?.map((importer: any) => (
-                          <SelectItem key={importer.id} value={importer.name}>
-                            {importer.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <Input placeholder="Digite ou selecione um importador..." {...field} />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
