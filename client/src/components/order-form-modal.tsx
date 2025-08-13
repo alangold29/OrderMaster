@@ -71,10 +71,8 @@ export default function OrderFormModal({ isOpen, onClose }: OrderFormModalProps)
 
   const createOrderMutation = useMutation({
     mutationFn: async (data: ManualOrder) => {
-      return apiRequest("/api/orders", {
-        method: "POST",
-        body: data,
-      });
+      const response = await apiRequest("POST", "/api/orders", data);
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
