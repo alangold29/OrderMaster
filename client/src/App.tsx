@@ -4,10 +4,11 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
-import { BarChart3, Package, Ship, CreditCard } from "lucide-react";
+import { BarChart3, Package, Ship, CreditCard, Database } from "lucide-react";
 import Dashboard from "@/pages/analytics";
 import Pedidos from "@/pages/dashboard";
 import Embarques from "@/pages/embarques";
+import CompleteData from "@/pages/complete-data";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -52,6 +53,16 @@ function Router() {
                 Embarques
               </Button>
             </Link>
+            <Link href="/dados">
+              <Button 
+                variant={location === "/dados" ? "default" : "ghost"}
+                size="default"
+                className="gap-2 px-4"
+              >
+                <Database className="h-4 w-4" />
+                Base de Dados
+              </Button>
+            </Link>
             <Link href="/contas">
               <Button 
                 variant={location === "/contas" ? "default" : "ghost"}
@@ -72,6 +83,7 @@ function Router() {
           <Route path="/" component={Dashboard} />
           <Route path="/pedidos" component={Pedidos} />
           <Route path="/embarques" component={Embarques} />
+          <Route path="/dados" component={CompleteData} />
           <Route path="/contas" component={() => <div className="text-center py-20"><h2 className="text-2xl font-semibold text-muted-foreground">Em desenvolvimento</h2><p className="text-muted-foreground mt-2">Página de contas correntes será implementada em breve</p></div>} />
           <Route component={NotFound} />
         </Switch>
