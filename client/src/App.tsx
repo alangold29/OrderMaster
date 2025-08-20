@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { BarChart3, Package, Ship, CreditCard, Database, Users } from "lucide-react";
+import logoPath from "@assets/Logo CGM_1755701171258.png";
 import Dashboard from "@/pages/analytics";
 import Pedidos from "@/pages/dashboard";
 import Embarques from "@/pages/embarques";
@@ -20,7 +21,12 @@ function Router() {
       {/* Navigation */}
       <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="max-w-7xl mx-auto flex h-16 items-center px-4">
-          <div className="mr-8 flex">
+          <div className="mr-8 flex items-center gap-3">
+            <img 
+              src={logoPath} 
+              alt="Logo CGM" 
+              className="h-10 w-10 object-contain"
+            />
             <h1 className="text-xl font-bold text-primary">CRM Importação</h1>
           </div>
           <div className="flex space-x-1">

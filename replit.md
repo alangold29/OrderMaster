@@ -1,6 +1,6 @@
 # Overview
 
-This is a CRM web application designed for import/export broker companies to manage orders and track shipments. The system allows users to import historical order data from Excel files and manage orders through a modern web interface. The application provides comprehensive order tracking, filtering, and management capabilities with support for multiple entities like clients, exporters, importers, and producers.
+This is a comprehensive CRM web application designed for import/export broker companies to manage orders, track shipments, and manage company users. The system allows users to import historical order data from Excel files and manage orders through a modern web interface. The application provides comprehensive order tracking, filtering, and management capabilities with support for multiple entities like clients, exporters, importers, and producers. Now includes a complete user management system with role-based access control and company branding with CGM logo integration.
 
 # User Preferences
 
@@ -32,9 +32,11 @@ Preferred communication style: Simple, everyday language.
 - **Order Management**: CRUD operations for orders with comprehensive filtering and sorting
 - **Excel Import**: Bulk import of historical order data from Excel/CSV files
 - **Entity Management**: Automatic creation and management of related entities (clients, exporters, etc.)
+- **User Management**: Complete user management system with role-based access control
 - **Search & Filtering**: Advanced filtering by multiple criteria including date ranges, entities, and status
 - **Pagination**: Efficient data loading with pagination support
 - **Responsive Design**: Mobile-friendly interface with adaptive layouts
+- **Company Branding**: CGM logo integration in the navigation bar
 
 ## Data Model
 The system uses a normalized database schema with:
@@ -43,6 +45,7 @@ The system uses a normalized database schema with:
 - **Exporters**: Export company entities
 - **Importers**: Import company entities  
 - **Producers**: Producer/manufacturer entities
+- **Company Users**: User management with roles, permissions, and activity tracking
 - **Foreign Key Relationships**: Orders reference related entities to maintain data integrity
 
 ## API Structure
