@@ -1,4 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Edit, Trash2, ArrowUpDown } from "lucide-react";
@@ -48,6 +50,35 @@ interface OrdersTableProps {
 }
 
 export default function OrdersTable({ filters, onFiltersChange }: OrdersTableProps) {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const deleteOrderMutation = useMutation({
+    mutationFn: async (orderId: string) => {
+      return await apiRequest(`/api/orders/${orderId}`, "DELETE");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      toast({
+        title: "Pedido excluído",
+        description: "O pedido foi excluído com sucesso.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro",
+        description: "Falha ao excluir o pedido.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleDelete = (orderId: string, pedidoNumber: string) => {
+    if (confirm(`Tem certeza que deseja excluir o pedido ${pedidoNumber}?`)) {
+      deleteOrderMutation.mutate(orderId);
+    }
+  };
+
   const { data, isLoading } = useQuery({
     queryKey: ["orders", filters],
     queryFn: async () => {
@@ -61,7 +92,7 @@ export default function OrdersTable({ filters, onFiltersChange }: OrdersTablePro
       if (filters.exporterId?.trim()) params.append("exporterId", filters.exporterId);
       if (filters.importerId?.trim()) params.append("importerId", filters.importerId);
       if (filters.producerId?.trim()) params.append("producerId", filters.producerId);
-      if (filters.situacao?.trim()) params.append("situacao", filters.situacao);
+      if (filters.situacao?.trim() && filters.situacao !== "all") params.append("situacao", filters.situacao);
       if (filters.sortBy?.trim()) params.append("sortBy", filters.sortBy);
       if (filters.sortOrder?.trim()) params.append("sortOrder", filters.sortOrder);
       
@@ -243,6 +274,8 @@ export default function OrdersTable({ filters, onFiltersChange }: OrdersTablePro
                       variant="ghost"
                       size="sm"
                       className="text-cancelled hover:text-red-700"
+                      onClick={() => handleDelete(order.id, order.pedido)}
+                      disabled={deleteOrderMutation.isPending}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>

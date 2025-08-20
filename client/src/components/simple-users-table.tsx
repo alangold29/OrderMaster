@@ -3,10 +3,13 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { CompanyUser, USER_ROLES } from "@shared/schema";
+import { UserForm } from "@/components/user-form";
 
 export function SimpleUsersTable() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [showForm, setShowForm] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<CompanyUser | null>(null);
 
   const { data: users, isLoading } = useQuery<CompanyUser[]>({
     queryKey: ["/api/company-users"],
@@ -120,31 +123,8 @@ export function SimpleUsersTable() {
         <button
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
           onClick={() => {
-            const email = prompt("Email do usuário:");
-            const name = prompt("Nome completo:");
-            const position = prompt("Posição/Cargo:");
-            
-            if (email && name && position) {
-              apiRequest("/api/company-users", "POST", {
-                email,
-                name,
-                position,
-                role: "viewer",
-                isActive: true
-              }).then(() => {
-                queryClient.invalidateQueries({ queryKey: ["/api/company-users"] });
-                toast({
-                  title: "Usuário criado",
-                  description: "O usuário foi criado com sucesso.",
-                });
-              }).catch(() => {
-                toast({
-                  title: "Erro",
-                  description: "Falha ao criar o usuário.",
-                  variant: "destructive",
-                });
-              });
-            }
+            setSelectedUser(null);
+            setShowForm(true);
           }}
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -296,6 +276,21 @@ export function SimpleUsersTable() {
             Começe criando um novo usuário para o sistema.
           </p>
         </div>
+      )}
+
+      {/* User Form Modal */}
+      {showForm && (
+        <UserForm
+          user={selectedUser}
+          onClose={() => {
+            setShowForm(false);
+            setSelectedUser(null);
+          }}
+          onSuccess={() => {
+            setShowForm(false);
+            setSelectedUser(null);
+          }}
+        />
       )}
     </div>
   );
