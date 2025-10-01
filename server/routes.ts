@@ -8,6 +8,31 @@ import * as XLSX from "xlsx";
 const upload = multer({ storage: multer.memoryStorage() });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Auth routes
+  // TODO: Replace with real authentication when implemented
+  app.get("/api/auth/me", async (req, res) => {
+    try {
+      // For now, return a demo user with manager role
+      // In a real implementation, this would get the user from the session
+      const demoUser = {
+        id: "demo-user-1",
+        email: "gerente@cgm.com",
+        name: "Gerente Demo",
+        position: "Gerente",
+        role: "manager", // Can be: admin, manager, editor, viewer
+        isActive: true,
+        permissions: {},
+        lastLogin: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      res.json(demoUser);
+    } catch (error) {
+      console.error("Error fetching current user:", error);
+      res.status(500).json({ error: "Failed to fetch current user" });
+    }
+  });
+
   // Orders routes
   app.get("/api/orders", async (req, res) => {
     try {
