@@ -112,6 +112,32 @@ export interface IStorage {
   updateUserPermissions(id: string, permissions: Record<string, boolean>): Promise<CompanyUser>;
   updateUserRole(id: string, role: string): Promise<CompanyUser>;
   toggleUserActive(id: string): Promise<CompanyUser>;
+
+  // Financial
+  getFinancialSummary(): Promise<{
+    totalRevenue: number;
+    totalOrders: number;
+    averageOrderValue: number;
+    byStatus: {
+      pendente: number;
+      emTransito: number;
+      entregue: number;
+    };
+  }>;
+  getAccountsReceivable(): Promise<Array<{
+    clientId: string;
+    clientName: string;
+    totalOrders: number;
+    totalAmount: number;
+    pendingOrders: number;
+    deliveredOrders: number;
+  }>>;
+  getClientFinancials(clientId: string): Promise<{
+    client: Client;
+    orders: OrderWithRelations[];
+    totalAmount: number;
+    totalOrders: number;
+  }>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -745,6 +771,130 @@ export class DatabaseStorage implements IStorage {
       .where(eq(companyUsers.id, id))
       .returning();
     return result[0];
+  }
+
+  // Financial methods
+  async getFinancialSummary() {
+    const allOrders = await db.select().from(orders);
+    
+    const totalRevenue = allOrders.reduce((acc, order) => {
+      const total = parseFloat(order.totalGuia?.toString() || '0');
+      return acc + total;
+    }, 0);
+
+    const byStatus = {
+      pendente: allOrders.reduce((acc, order) => {
+        if (order.situacao === 'pendente') {
+          return acc + parseFloat(order.totalGuia?.toString() || '0');
+        }
+        return acc;
+      }, 0),
+      emTransito: allOrders.reduce((acc, order) => {
+        if (order.situacao === 'em trânsito' || order.situacao === 'em transito') {
+          return acc + parseFloat(order.totalGuia?.toString() || '0');
+        }
+        return acc;
+      }, 0),
+      entregue: allOrders.reduce((acc, order) => {
+        if (order.situacao === 'entregue') {
+          return acc + parseFloat(order.totalGuia?.toString() || '0');
+        }
+        return acc;
+      }, 0),
+    };
+
+    return {
+      totalRevenue,
+      totalOrders: allOrders.length,
+      averageOrderValue: allOrders.length > 0 ? totalRevenue / allOrders.length : 0,
+      byStatus,
+    };
+  }
+
+  async getAccountsReceivable() {
+    const allOrders = await db.select({
+      orderId: orders.id,
+      clientId: orders.clientId,
+      clientName: clients.name,
+      totalGuia: orders.totalGuia,
+      situacao: orders.situacao,
+    })
+    .from(orders)
+    .leftJoin(clients, eq(orders.clientId, clients.id))
+    .orderBy(desc(clients.name));
+
+    const clientMap = new Map<string, {
+      clientId: string;
+      clientName: string;
+      totalOrders: number;
+      totalAmount: number;
+      pendingOrders: number;
+      deliveredOrders: number;
+    }>();
+
+    allOrders.forEach(order => {
+      const clientId = order.clientId || '';
+      const clientName = order.clientName || 'Cliente desconocido';
+      
+      if (!clientMap.has(clientId)) {
+        clientMap.set(clientId, {
+          clientId,
+          clientName,
+          totalOrders: 0,
+          totalAmount: 0,
+          pendingOrders: 0,
+          deliveredOrders: 0,
+        });
+      }
+
+      const client = clientMap.get(clientId)!;
+      client.totalOrders++;
+      client.totalAmount += parseFloat(order.totalGuia?.toString() || '0');
+      
+      if (order.situacao === 'pendente') {
+        client.pendingOrders++;
+      } else if (order.situacao === 'entregue') {
+        client.deliveredOrders++;
+      }
+    });
+
+    return Array.from(clientMap.values()).sort((a, b) => b.totalAmount - a.totalAmount);
+  }
+
+  async getClientFinancials(clientId: string) {
+    const client = await db.select().from(clients).where(eq(clients.id, clientId));
+    
+    if (!client.length) {
+      throw new Error('Client not found');
+    }
+
+    const clientOrders = await db.select()
+      .from(orders)
+      .leftJoin(exporters, eq(orders.exporterId, exporters.id))
+      .leftJoin(importers, eq(orders.importerId, importers.id))
+      .leftJoin(clients, eq(orders.clientId, clients.id))
+      .leftJoin(producers, eq(orders.producerId, producers.id))
+      .where(eq(orders.clientId, clientId))
+      .orderBy(desc(orders.data));
+
+    const ordersWithRelations: OrderWithRelations[] = clientOrders.map(row => ({
+      ...row.orders,
+      exporter: row.exporters!,
+      importer: row.importers!,
+      client: row.clients!,
+      producer: row.producers || undefined,
+    }));
+
+    const totalAmount = ordersWithRelations.reduce((acc, order) => {
+      return acc + parseFloat(order.totalGuia?.toString() || '0');
+    }, 0);
+
+    return {
+      client: client[0],
+      orders: ordersWithRelations,
+      totalAmount,
+      totalOrders: ordersWithRelations.length,
+    };
   }
 }
 

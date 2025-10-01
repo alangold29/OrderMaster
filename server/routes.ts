@@ -392,6 +392,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Financial routes
+  app.get("/api/financial/summary", async (req, res) => {
+    try {
+      const summary = await storage.getFinancialSummary();
+      res.json(summary);
+    } catch (error) {
+      console.error("Error fetching financial summary:", error);
+      res.status(500).json({ error: "Failed to fetch financial summary" });
+    }
+  });
+
+  app.get("/api/financial/accounts-receivable", async (req, res) => {
+    try {
+      const accounts = await storage.getAccountsReceivable();
+      res.json(accounts);
+    } catch (error) {
+      console.error("Error fetching accounts receivable:", error);
+      res.status(500).json({ error: "Failed to fetch accounts receivable" });
+    }
+  });
+
+  app.get("/api/financial/by-client/:clientId", async (req, res) => {
+    try {
+      const clientFinancials = await storage.getClientFinancials(req.params.clientId);
+      res.json(clientFinancials);
+    } catch (error) {
+      console.error("Error fetching client financials:", error);
+      res.status(500).json({ error: "Failed to fetch client financials" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

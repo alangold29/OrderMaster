@@ -10,6 +10,7 @@ import Dashboard from "@/pages/analytics";
 import Pedidos from "@/pages/dashboard";
 import Embarques from "@/pages/embarques";
 import CompleteData from "@/pages/complete-data";
+import Contas from "@/pages/contas";
 import Usuarios from "@/pages/usuarios";
 import NotFound from "@/pages/not-found";
 
@@ -113,8 +114,8 @@ function Router() {
             <Route path="/pedidos" component={Pedidos} />
             <Route path="/embarques" component={Embarques} />
             <Route path="/dados" component={CompleteData} />
+            <Route path="/contas" component={Contas} />
             <Route path="/usuarios" component={Usuarios} />
-            <Route path="/contas" component={() => <div className="text-center py-20"><h2 className="text-2xl font-semibold text-muted-foreground">Em desenvolvimento</h2><p className="text-muted-foreground mt-2">Página de contas correntes será implementada em breve</p></div>} />
             <Route component={NotFound} />
           </Switch>
         </div>
