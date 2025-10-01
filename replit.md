@@ -34,6 +34,7 @@ Preferred communication style: Simple, everyday language.
 - **Excel Import**: Bulk import of historical order data from Excel/CSV files
 - **Entity Management**: Automatic creation and management of related entities (clients, exporters, etc.)
 - **User Management**: Complete user management system with role-based access control
+- **Financial Management**: Accounts receivable tracking, revenue analytics, and client financial summaries
 - **Search & Filtering**: Advanced filtering by multiple criteria including date ranges, entities, and status
 - **Pagination**: Efficient data loading with pagination support
 - **Responsive Design**: Mobile-friendly interface with adaptive layouts
@@ -56,6 +57,9 @@ RESTful endpoints following standard conventions:
 - `PUT /api/orders/:id` - Update existing orders
 - `DELETE /api/orders/:id` - Delete orders
 - `POST /api/import/excel` - Bulk import from Excel files
+- `GET /api/financial/summary` - Financial summary with totals and averages
+- `GET /api/financial/accounts-receivable` - Accounts receivable grouped by client
+- `GET /api/financial/by-client/:clientId` - Client-specific financial details
 - Entity endpoints for clients, exporters, importers, and producers
 
 # External Dependencies
