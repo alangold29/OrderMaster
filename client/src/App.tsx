@@ -13,9 +13,11 @@ import CompleteData from "@/pages/complete-data";
 import Contas from "@/pages/contas";
 import Usuarios from "@/pages/usuarios";
 import NotFound from "@/pages/not-found";
+import { useCurrentUser } from "@/hooks/use-current-user";
 
 function Router() {
   const [location] = useLocation();
+  const { canAccessFinancials } = useCurrentUser();
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -80,17 +82,19 @@ function Router() {
                 Base de Dados
               </Button>
             </Link>
-            <Link href="/contas">
-              <Button 
-                variant={location === "/contas" ? "default" : "ghost"}
-                size="default"
-                className="w-full justify-start gap-3 px-4"
-                data-testid="link-contas"
-              >
-                <CreditCard className="h-4 w-4" />
-                Contas Correntes
-              </Button>
-            </Link>
+            {canAccessFinancials && (
+              <Link href="/contas">
+                <Button 
+                  variant={location === "/contas" ? "default" : "ghost"}
+                  size="default"
+                  className="w-full justify-start gap-3 px-4"
+                  data-testid="link-contas"
+                >
+                  <CreditCard className="h-4 w-4" />
+                  Contas Correntes
+                </Button>
+              </Link>
+            )}
             <Link href="/usuarios">
               <Button 
                 variant={location === "/usuarios" ? "default" : "ghost"}
