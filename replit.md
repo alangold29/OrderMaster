@@ -12,6 +12,7 @@ Preferred communication style: Simple, everyday language.
 - **Framework**: React with TypeScript using Vite as the build tool
 - **UI Components**: Shadcn/ui component library built on Radix UI primitives
 - **Styling**: Tailwind CSS with custom CSS variables for theming
+- **Layout**: Vertical sidebar navigation on the left with CGM logo and main content area on the right
 - **State Management**: TanStack Query (React Query) for server state management
 - **Routing**: Wouter for client-side routing
 - **Forms**: React Hook Form with Zod validation
@@ -36,7 +37,7 @@ Preferred communication style: Simple, everyday language.
 - **Search & Filtering**: Advanced filtering by multiple criteria including date ranges, entities, and status
 - **Pagination**: Efficient data loading with pagination support
 - **Responsive Design**: Mobile-friendly interface with adaptive layouts
-- **Company Branding**: CGM logo integration in the navigation bar
+- **Company Branding**: CGM logo integration in the vertical sidebar navigation
 
 ## Data Model
 The system uses a normalized database schema with:

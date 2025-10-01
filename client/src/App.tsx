@@ -17,24 +17,30 @@ function Router() {
   const [location] = useLocation();
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Navigation */}
-      <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="max-w-7xl mx-auto flex h-16 items-center px-4">
-          <div className="mr-8 flex items-center gap-3">
+    <div className="min-h-screen bg-background flex">
+      {/* Sidebar Navigation */}
+      <aside className="w-64 border-r bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex flex-col">
+        {/* Logo and Title */}
+        <div className="border-b p-6">
+          <div className="flex items-center gap-3">
             <img 
               src={logoPath} 
               alt="Logo CGM" 
               className="h-10 w-10 object-contain"
             />
-            <h1 className="text-xl font-bold text-primary">CRM Importação</h1>
+            <h1 className="text-lg font-bold text-primary">CRM Importação</h1>
           </div>
-          <div className="flex space-x-1">
+        </div>
+
+        {/* Navigation Links */}
+        <nav className="flex-1 p-4">
+          <div className="flex flex-col space-y-2">
             <Link href="/">
               <Button 
                 variant={location === "/" ? "default" : "ghost"}
                 size="default"
-                className="gap-2 px-4"
+                className="w-full justify-start gap-3 px-4"
+                data-testid="link-dashboard"
               >
                 <BarChart3 className="h-4 w-4" />
                 Dashboard
@@ -44,7 +50,8 @@ function Router() {
               <Button 
                 variant={location === "/pedidos" ? "default" : "ghost"}
                 size="default"
-                className="gap-2 px-4"
+                className="w-full justify-start gap-3 px-4"
+                data-testid="link-pedidos"
               >
                 <Package className="h-4 w-4" />
                 Pedidos
@@ -54,7 +61,8 @@ function Router() {
               <Button 
                 variant={location === "/embarques" ? "default" : "ghost"}
                 size="default"
-                className="gap-2 px-4"
+                className="w-full justify-start gap-3 px-4"
+                data-testid="link-embarques"
               >
                 <Ship className="h-4 w-4" />
                 Embarques
@@ -64,7 +72,8 @@ function Router() {
               <Button 
                 variant={location === "/dados" ? "default" : "ghost"}
                 size="default"
-                className="gap-2 px-4"
+                className="w-full justify-start gap-3 px-4"
+                data-testid="link-dados"
               >
                 <Database className="h-4 w-4" />
                 Base de Dados
@@ -74,7 +83,8 @@ function Router() {
               <Button 
                 variant={location === "/contas" ? "default" : "ghost"}
                 size="default"
-                className="gap-2 px-4"
+                className="w-full justify-start gap-3 px-4"
+                data-testid="link-contas"
               >
                 <CreditCard className="h-4 w-4" />
                 Contas Correntes
@@ -84,27 +94,30 @@ function Router() {
               <Button 
                 variant={location === "/usuarios" ? "default" : "ghost"}
                 size="default"
-                className="gap-2 px-4"
+                className="w-full justify-start gap-3 px-4"
+                data-testid="link-usuarios"
               >
                 <Users className="h-4 w-4" />
                 Usuários
               </Button>
             </Link>
           </div>
-        </div>
-      </nav>
+        </nav>
+      </aside>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        <Switch>
-          <Route path="/" component={Dashboard} />
-          <Route path="/pedidos" component={Pedidos} />
-          <Route path="/embarques" component={Embarques} />
-          <Route path="/dados" component={CompleteData} />
-          <Route path="/usuarios" component={Usuarios} />
-          <Route path="/contas" component={() => <div className="text-center py-20"><h2 className="text-2xl font-semibold text-muted-foreground">Em desenvolvimento</h2><p className="text-muted-foreground mt-2">Página de contas correntes será implementada em breve</p></div>} />
-          <Route component={NotFound} />
-        </Switch>
+      <main className="flex-1 overflow-auto">
+        <div className="max-w-7xl mx-auto px-8 py-8">
+          <Switch>
+            <Route path="/" component={Dashboard} />
+            <Route path="/pedidos" component={Pedidos} />
+            <Route path="/embarques" component={Embarques} />
+            <Route path="/dados" component={CompleteData} />
+            <Route path="/usuarios" component={Usuarios} />
+            <Route path="/contas" component={() => <div className="text-center py-20"><h2 className="text-2xl font-semibold text-muted-foreground">Em desenvolvimento</h2><p className="text-muted-foreground mt-2">Página de contas correntes será implementada em breve</p></div>} />
+            <Route component={NotFound} />
+          </Switch>
+        </div>
       </main>
     </div>
   );
