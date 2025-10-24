@@ -117,13 +117,11 @@ class Storage implements IStorage {
     if (ordersError) throw ordersError;
 
     return {
-      data: orders,
-      pagination: {
-        page,
-        limit,
-        total: count || 0,
-        totalPages: Math.ceil((count || 0) / limit),
-      },
+      orders: orders || [],
+      total: count || 0,
+      page,
+      limit,
+      totalPages: Math.ceil((count || 0) / limit),
     };
   }
 
@@ -261,21 +259,32 @@ class Storage implements IStorage {
       .from('orders')
       .select('*', { count: 'exact', head: true });
 
-    const { count: pendentes } = await supabase
+    const { count: pendente } = await supabase
       .from('orders')
       .select('*', { count: 'exact', head: true })
       .eq('situacao', 'pendente');
 
-    const { count: embarcados } = await supabase
+    const { count: emTransito } = await supabase
       .from('orders')
       .select('*', { count: 'exact', head: true })
-      .eq('situacao', 'embarcado');
+      .eq('situacao', 'em-transito');
+
+    const { count: entregue } = await supabase
+      .from('orders')
+      .select('*', { count: 'exact', head: true })
+      .eq('situacao', 'entregue');
+
+    const { count: quitado } = await supabase
+      .from('orders')
+      .select('*', { count: 'exact', head: true })
+      .eq('situacao', 'quitado');
 
     return {
       total: total || 0,
-      pendentes: pendentes || 0,
-      embarcados: embarcados || 0,
-      completos: 0,
+      pendente: pendente || 0,
+      emTransito: emTransito || 0,
+      entregue: entregue || 0,
+      quitado: quitado || 0,
     };
   }
 
