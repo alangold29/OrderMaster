@@ -49,7 +49,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         sortOrder,
       } = req.query;
 
-      const result = await storage.getOrders({
+      console.log("📥 GET /api/orders - Query params:", req.query);
+
+      const params = {
         page: parseInt(page as string),
         limit: parseInt(limit as string),
         search: search as string,
@@ -60,12 +62,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         situacao: situacao as string,
         sortBy: sortBy as string,
         sortOrder: sortOrder as 'asc' | 'desc',
-      });
+      };
 
+      console.log("🔧 Processed params:", params);
+
+      const result = await storage.getOrders(params);
+
+      console.log(`📤 Returning ${result.orders.length} orders out of ${result.total} total`);
       res.json(result);
     } catch (error) {
-      console.error("Error fetching orders:", error);
-      res.status(500).json({ error: "Failed to fetch orders" });
+      console.error("❌ Error fetching orders:", error);
+      res.status(500).json({ error: "Failed to fetch orders", details: error instanceof Error ? error.message : String(error) });
     }
   });
 

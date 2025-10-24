@@ -67,13 +67,13 @@ export default function OrdersTable({ filters, onFiltersChange }: OrdersTablePro
     }
   };
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ["orders", filters],
     queryFn: async () => {
       const params = new URLSearchParams();
       params.append("page", filters.page.toString());
       params.append("limit", "10");
-      
+
       // Only add non-empty parameters to avoid sending empty strings
       if (filters.search?.trim()) params.append("search", filters.search);
       if (filters.clientId?.trim()) params.append("clientId", filters.clientId);
@@ -83,16 +83,20 @@ export default function OrdersTable({ filters, onFiltersChange }: OrdersTablePro
       if (filters.situacao?.trim() && filters.situacao !== "all") params.append("situacao", filters.situacao);
       if (filters.sortBy?.trim()) params.append("sortBy", filters.sortBy);
       if (filters.sortOrder?.trim()) params.append("sortOrder", filters.sortOrder);
-      
+
       const url = `/api/orders?${params}`;
-      console.log("Fetching URL:", url); // Debug log
-      
+      console.log("🔍 Fetching orders with URL:", url);
+      console.log("🔍 Active filters:", filters);
+
       const response = await fetch(url);
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error("❌ API Error:", errorText);
         throw new Error('Network response was not ok');
       }
       const result = await response.json();
-      console.log("API Response:", result); // Debug log
+      console.log("✅ API Response:", result);
+      console.log(`📊 Found ${result.total} total orders, ${result.orders?.length || 0} on this page`);
       return result;
     },
   });
@@ -154,7 +158,7 @@ export default function OrdersTable({ filters, onFiltersChange }: OrdersTablePro
         <Table>
           <TableHeader>
             <TableRow>
-              {[...Array(14)].map((_, i) => (
+              {[...Array(12)].map((_, i) => (
                 <TableHead key={i}>
                   <Skeleton className="h-4 w-20" />
                 </TableHead>
@@ -164,7 +168,7 @@ export default function OrdersTable({ filters, onFiltersChange }: OrdersTablePro
           <TableBody>
             {[...Array(5)].map((_, i) => (
               <TableRow key={i}>
-                {[...Array(14)].map((_, j) => (
+                {[...Array(12)].map((_, j) => (
                   <TableCell key={j}>
                     <Skeleton className="h-4 w-full" />
                   </TableCell>
@@ -173,6 +177,15 @@ export default function OrdersTable({ filters, onFiltersChange }: OrdersTablePro
             ))}
           </TableBody>
         </Table>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-8 text-center">
+        <p className="text-red-600 mb-2">Erro ao carregar pedidos</p>
+        <p className="text-sm text-gray-500">{error.message}</p>
       </div>
     );
   }
