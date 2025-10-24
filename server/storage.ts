@@ -218,6 +218,16 @@ class Storage implements IStorage {
   }
 
   async createOrder(orderData: any) {
+    const { data: existingOrder } = await supabase
+      .from('orders')
+      .select('id, pedido')
+      .eq('pedido', orderData.pedido)
+      .maybeSingle();
+
+    if (existingOrder) {
+      throw new Error(`Pedido duplicado: já existe um pedido com o número ${orderData.pedido}`);
+    }
+
     const clientId = await getOrCreateEntity('clients', orderData.clientName);
     const exporterId = await getOrCreateEntity('exporters', orderData.exporterName);
     const importerId = await getOrCreateEntity('importers', orderData.importerName);

@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { manualOrderSchema, type ManualOrder } from "@shared/schema";
-import { X } from "lucide-react";
+import { X, CheckCircle2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -30,6 +30,9 @@ import {
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 interface OrderFormModalProps {
   isOpen: boolean;
@@ -39,6 +42,8 @@ interface OrderFormModalProps {
 export default function OrderFormModal({ isOpen, onClose }: OrderFormModalProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [openExporter, setOpenExporter] = useState(false);
+  const [openImporter, setOpenImporter] = useState(false);
   
   const form = useForm<ManualOrder>({
     resolver: zodResolver(manualOrderSchema),
@@ -60,14 +65,21 @@ export default function OrderFormModal({ isOpen, onClose }: OrderFormModalProps)
     },
   });
 
-  // Fetch data for dropdowns
-  const { data: exporters } = useQuery<any[]>({
+  const { data: exporters, isLoading: loadingExporters } = useQuery<any[]>({
     queryKey: ["/api/exporters"],
   });
 
-  const { data: importers } = useQuery<any[]>({
+  const { data: importers, isLoading: loadingImporters } = useQuery<any[]>({
     queryKey: ["/api/importers"],
   });
+
+  const exportersList = useMemo(() => {
+    return exporters?.filter((e: any) => e.name && e.name.trim() !== "") || [];
+  }, [exporters]);
+
+  const importersList = useMemo(() => {
+    return importers?.filter((i: any) => i.name && i.name.trim() !== "") || [];
+  }, [importers]);
 
   const createOrderMutation = useMutation({
     mutationFn: async (data: ManualOrder) => {
@@ -75,20 +87,29 @@ export default function OrderFormModal({ isOpen, onClose }: OrderFormModalProps)
       return response.json();
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
       queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
       queryClient.invalidateQueries({ queryKey: ["/api/stats"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/exporters"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/importers"] });
       toast({
-        title: "Sucesso",
-        description: "Pedido criado com sucesso!",
+        title: "Pedido criado com sucesso!",
+        description: `O pedido foi adicionado ao sistema e está visível em todas as seções.`,
+        duration: 4000,
       });
       form.reset();
       onClose();
     },
     onError: (error: any) => {
+      console.error("Error creating order:", error);
+      const errorMessage = error.message || "Erro ao criar pedido";
       toast({
-        title: "Erro",
-        description: error.message || "Erro ao criar pedido",
+        title: "Erro ao criar pedido",
+        description: errorMessage.includes("unique")
+          ? "Já existe um pedido com este número. Por favor, use um número diferente."
+          : errorMessage,
         variant: "destructive",
+        duration: 6000,
       });
     },
   });
@@ -179,11 +200,53 @@ export default function OrderFormModal({ isOpen, onClose }: OrderFormModalProps)
                 control={form.control}
                 name="exporterName"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="flex flex-col">
                     <FormLabel>Exportador *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Digite ou selecione um exportador..." {...field} />
-                    </FormControl>
+                    <Popover open={openExporter} onOpenChange={setOpenExporter}>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            className={cn(
+                              "w-full justify-between",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value || "Selecione ou digite um exportador..."}
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-full p-0">
+                        <Command>
+                          <CommandInput
+                            placeholder="Buscar ou criar exportador..."
+                            onValueChange={(value) => field.onChange(value)}
+                          />
+                          <CommandEmpty>Nenhum exportador encontrado.</CommandEmpty>
+                          <CommandGroup>
+                            {exportersList.map((exporter: any) => (
+                              <CommandItem
+                                key={exporter.id}
+                                value={exporter.name}
+                                onSelect={() => {
+                                  field.onChange(exporter.name);
+                                  setOpenExporter(false);
+                                }}
+                              >
+                                <CheckCircle2
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    field.value === exporter.name ? "opacity-100" : "opacity-0"
+                                  )}
+                                />
+                                {exporter.name}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -193,11 +256,53 @@ export default function OrderFormModal({ isOpen, onClose }: OrderFormModalProps)
                 control={form.control}
                 name="importerName"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="flex flex-col">
                     <FormLabel>Importador *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Digite ou selecione um importador..." {...field} />
-                    </FormControl>
+                    <Popover open={openImporter} onOpenChange={setOpenImporter}>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            className={cn(
+                              "w-full justify-between",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value || "Selecione ou digite um importador..."}
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-full p-0">
+                        <Command>
+                          <CommandInput
+                            placeholder="Buscar ou criar importador..."
+                            onValueChange={(value) => field.onChange(value)}
+                          />
+                          <CommandEmpty>Nenhum importador encontrado.</CommandEmpty>
+                          <CommandGroup>
+                            {importersList.map((importer: any) => (
+                              <CommandItem
+                                key={importer.id}
+                                value={importer.name}
+                                onSelect={() => {
+                                  field.onChange(importer.name);
+                                  setOpenImporter(false);
+                                }}
+                              >
+                                <CheckCircle2
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    field.value === importer.name ? "opacity-100" : "opacity-0"
+                                  )}
+                                />
+                                {importer.name}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                     <FormMessage />
                   </FormItem>
                 )}

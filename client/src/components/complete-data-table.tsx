@@ -56,19 +56,27 @@ export default function CompleteDataTable({
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
   const { data: ordersData, isLoading } = useQuery<{ orders: any[]; total: number }>({
-    queryKey: [
-      "/api/orders",
-      filters.page,
-      20, // Show more records per page
-      filters.search,
-      filters.clientId,
-      filters.exporterId,
-      filters.importerId,
-      filters.producerId,
-      filters.situacao,
-      filters.sortBy,
-      filters.sortOrder,
-    ],
+    queryKey: ["orders", filters],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      params.append("page", filters.page.toString());
+      params.append("limit", "20");
+
+      if (filters.search?.trim()) params.append("search", filters.search);
+      if (filters.clientId?.trim()) params.append("clientId", filters.clientId);
+      if (filters.exporterId?.trim()) params.append("exporterId", filters.exporterId);
+      if (filters.importerId?.trim()) params.append("importerId", filters.importerId);
+      if (filters.producerId?.trim()) params.append("producerId", filters.producerId);
+      if (filters.situacao?.trim() && filters.situacao !== "all") params.append("situacao", filters.situacao);
+      if (filters.sortBy?.trim()) params.append("sortBy", filters.sortBy);
+      if (filters.sortOrder?.trim()) params.append("sortOrder", filters.sortOrder);
+
+      const response = await fetch(`/api/orders?${params}`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    },
   });
 
   const { data: exporters } = useQuery<any[]>({ queryKey: ["/api/exporters"] });
