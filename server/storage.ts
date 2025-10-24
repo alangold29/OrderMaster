@@ -1,5 +1,5 @@
-import { drizzle } from "drizzle-orm/neon-http";
-import { neon } from "@neondatabase/serverless";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
 import { eq, like, and, or, desc, asc, count, sum, isNotNull, gte, lte } from "drizzle-orm";
 import {
   orders,
@@ -24,8 +24,12 @@ import {
   type ManualOrder,
 } from "@shared/schema";
 
-const sql = neon(process.env.DATABASE_URL!);
-const db = drizzle(sql);
+if (!process.env.DATABASE_URL) {
+  throw new Error("DATABASE_URL must be set. Did you forget to provision a database?");
+}
+
+const client = postgres(process.env.DATABASE_URL);
+const db = drizzle(client);
 
 export interface IStorage {
   // Orders
