@@ -30,18 +30,6 @@ interface OrdersTableProps {
     importerId: string;
     producerId: string;
     situacao: string;
-    clienteRede: string;
-    representante: string;
-    produto: string;
-    referenciaExportador: string;
-    referenciaImportador: string;
-    clienteFinal: string;
-    grupo: string;
-    paisExportador: string;
-    dataEmissaoInicio: string;
-    dataEmissaoFim: string;
-    dataEmbarqueInicio: string;
-    dataEmbarqueFim: string;
     page: number;
     sortBy: string;
     sortOrder: "asc" | "desc";
@@ -203,28 +191,25 @@ export default function OrdersTable({ filters, onFiltersChange }: OrdersTablePro
             <TableRow className="bg-gray-50">
               <TableHead className="cursor-pointer hover:bg-gray-100" onClick={() => handleSort("pedido")}>
                 <div className="flex items-center">
-                  Pedido ou ano
+                  Pedido
                   <ArrowUpDown className="ml-1 h-3 w-3" />
                 </div>
               </TableHead>
+              <TableHead className="cursor-pointer hover:bg-gray-100" onClick={() => handleSort("data")}>
+                <div className="flex items-center">
+                  Data
+                  <ArrowUpDown className="ml-1 h-3 w-3" />
+                </div>
+              </TableHead>
+              <TableHead>Cliente</TableHead>
               <TableHead>Exportador</TableHead>
               <TableHead>Importador</TableHead>
-              <TableHead>Cliente Rede</TableHead>
-              <TableHead>Representante</TableHead>
-              <TableHead>Produto</TableHead>
-              <TableHead className="cursor-pointer hover:bg-gray-100" onClick={() => handleSort("dataEmissaoPedido")}>
-                <div className="flex items-center">
-                  Data Emissão
-                  <ArrowUpDown className="ml-1 h-3 w-3" />
-                </div>
-              </TableHead>
+              <TableHead>Produtor</TableHead>
+              <TableHead>Itens</TableHead>
+              <TableHead>Quantidade</TableHead>
               <TableHead>Situação</TableHead>
-              <TableHead>Ref. Exportador</TableHead>
-              <TableHead>Ref. Importador</TableHead>
-              <TableHead>Cliente Final</TableHead>
-              <TableHead>Data Embarque</TableHead>
-              <TableHead>Grupo</TableHead>
-              <TableHead>País Exportador</TableHead>
+              <TableHead>Embarque</TableHead>
+              <TableHead>Previsão</TableHead>
               <TableHead>Ações</TableHead>
             </TableRow>
           </TableHeader>
@@ -233,33 +218,28 @@ export default function OrdersTable({ filters, onFiltersChange }: OrdersTablePro
               <TableRow key={order.id} className="hover:bg-gray-50">
                 <TableCell className="font-medium">{order.pedido}</TableCell>
                 <TableCell className="text-text-secondary">
-                  {order.exporter?.name}
+                  {formatDate(order.data)}
+                </TableCell>
+                <TableCell>{order.client?.name || "-"}</TableCell>
+                <TableCell className="text-text-secondary">
+                  {order.exporter?.name || "-"}
                 </TableCell>
                 <TableCell className="text-text-secondary">
-                  {order.importer?.name}
+                  {order.importer?.name || "-"}
                 </TableCell>
-                <TableCell>{order.clienteRede || "-"}</TableCell>
                 <TableCell className="text-text-secondary">
-                  {order.representante || "-"}
+                  {order.producer?.name || "-"}
                 </TableCell>
-                <TableCell>{order.produto || order.itens || "-"}</TableCell>
+                <TableCell>{order.itens || "-"}</TableCell>
                 <TableCell className="text-text-secondary">
-                  {formatDate(order.dataEmissaoPedido || order.data)}
+                  {order.quantidade || "-"}
                 </TableCell>
                 <TableCell>{getStatusBadge(order.situacao)}</TableCell>
                 <TableCell className="text-text-secondary">
-                  {order.referenciaExportador || "-"}
+                  {formatDate(order.embarque)}
                 </TableCell>
                 <TableCell className="text-text-secondary">
-                  {order.referenciaImportador || "-"}
-                </TableCell>
-                <TableCell>{order.clienteFinal || "-"}</TableCell>
-                <TableCell className="text-text-secondary">
-                  {formatDate(order.dataEmbarqueDe)}
-                </TableCell>
-                <TableCell>{order.grupo || "-"}</TableCell>
-                <TableCell className="text-text-secondary">
-                  {order.paisExportador || "-"}
+                  {formatDate(order.previsao)}
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center space-x-2">
@@ -285,7 +265,7 @@ export default function OrdersTable({ filters, onFiltersChange }: OrdersTablePro
             ))}
             {orders.length === 0 && (
               <TableRow>
-                <TableCell colSpan={15} className="text-center py-8 text-text-secondary">
+                <TableCell colSpan={12} className="text-center py-8 text-text-secondary">
                   Nenhum pedido encontrado
                 </TableCell>
               </TableRow>

@@ -16,18 +16,6 @@ interface FiltersProps {
     importerId: string;
     producerId: string;
     situacao: string;
-    clienteRede: string;
-    representante: string;
-    produto: string;
-    referenciaExportador: string;
-    referenciaImportador: string;
-    clienteFinal: string;
-    grupo: string;
-    paisExportador: string;
-    dataEmissaoInicio: string;
-    dataEmissaoFim: string;
-    dataEmbarqueInicio: string;
-    dataEmbarqueFim: string;
     page: number;
     sortBy: string;
     sortOrder: "asc" | "desc";
@@ -64,18 +52,6 @@ export default function FiltersSection({ filters, onFiltersChange }: FiltersProp
       importerId: "",
       producerId: "",
       situacao: "",
-      clienteRede: "",
-      representante: "",
-      produto: "",
-      referenciaExportador: "",
-      referenciaImportador: "",
-      clienteFinal: "",
-      grupo: "",
-      paisExportador: "",
-      dataEmissaoInicio: "",
-      dataEmissaoFim: "",
-      dataEmbarqueInicio: "",
-      dataEmbarqueFim: "",
       page: 1,
       sortBy: "data",
       sortOrder: "desc",
@@ -84,19 +60,20 @@ export default function FiltersSection({ filters, onFiltersChange }: FiltersProp
 
   const getActiveFilters = () => {
     const active = [];
-    
+
     if (filters.search) {
       active.push({
         key: "search",
         label: `Busca: ${filters.search}`,
       });
     }
-    
+
     if (filters.situacao) {
       const statusLabels = {
         pendente: "Pendente",
         "em-transito": "Em Trânsito",
         entregue: "Entregue",
+        quitado: "Quitado",
         cancelado: "Cancelado",
       };
       active.push({
@@ -104,7 +81,7 @@ export default function FiltersSection({ filters, onFiltersChange }: FiltersProp
         label: `Status: ${statusLabels[filters.situacao as keyof typeof statusLabels]}`,
       });
     }
-    
+
     if (filters.clientId && clients) {
       const client = clients.find((c: any) => c.id === filters.clientId);
       if (client) {
@@ -114,7 +91,7 @@ export default function FiltersSection({ filters, onFiltersChange }: FiltersProp
         });
       }
     }
-    
+
     if (filters.exporterId && exporters) {
       const exporter = exporters.find((e: any) => e.id === filters.exporterId);
       if (exporter) {
@@ -124,7 +101,7 @@ export default function FiltersSection({ filters, onFiltersChange }: FiltersProp
         });
       }
     }
-    
+
     if (filters.importerId && importers) {
       const importer = importers.find((i: any) => i.id === filters.importerId);
       if (importer) {
@@ -135,55 +112,16 @@ export default function FiltersSection({ filters, onFiltersChange }: FiltersProp
       }
     }
 
-    if (filters.clienteRede) {
-      active.push({
-        key: "clienteRede",
-        label: `Cliente Rede: ${filters.clienteRede}`,
-      });
+    if (filters.producerId && producers) {
+      const producer = producers.find((p: any) => p.id === filters.producerId);
+      if (producer) {
+        active.push({
+          key: "producerId",
+          label: `Produtor: ${producer.name}`,
+        });
+      }
     }
 
-    if (filters.representante) {
-      active.push({
-        key: "representante",
-        label: `Representante: ${filters.representante}`,
-      });
-    }
-
-    if (filters.produto) {
-      active.push({
-        key: "produto",
-        label: `Produto: ${filters.produto}`,
-      });
-    }
-
-    if (filters.grupo) {
-      active.push({
-        key: "grupo",
-        label: `Grupo: ${filters.grupo}`,
-      });
-    }
-
-    if (filters.paisExportador) {
-      active.push({
-        key: "paisExportador",
-        label: `País: ${filters.paisExportador}`,
-      });
-    }
-
-    if (filters.dataEmissaoInicio && filters.dataEmissaoFim) {
-      active.push({
-        key: "dataEmissao",
-        label: `Data Emissão: ${filters.dataEmissaoInicio} - ${filters.dataEmissaoFim}`,
-      });
-    }
-
-    if (filters.dataEmbarqueInicio && filters.dataEmbarqueFim) {
-      active.push({
-        key: "dataEmbarque",
-        label: `Data Embarque: ${filters.dataEmbarqueInicio} - ${filters.dataEmbarqueFim}`,
-      });
-    }
-    
     return active;
   };
 
@@ -193,7 +131,7 @@ export default function FiltersSection({ filters, onFiltersChange }: FiltersProp
     <Card className="bg-surface border border-gray-200">
       <CardContent className="p-6">
         {/* Basic Filters - Always Visible */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
           {/* Search */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -208,21 +146,36 @@ export default function FiltersSection({ filters, onFiltersChange }: FiltersProp
           {/* Status */}
           <Select value={filters.situacao || "all"} onValueChange={(value) => handleFilterChange("situacao", value)}>
             <SelectTrigger>
-              <SelectValue placeholder="Situação" />
+              <SelectValue placeholder="Todas as situações" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todas as situações</SelectItem>
               <SelectItem value="pendente">Pendente</SelectItem>
               <SelectItem value="em-transito">Em Trânsito</SelectItem>
               <SelectItem value="entregue">Entregue</SelectItem>
-              <SelectItem value="cancelado">Cancelado</SelectItem>
+              <SelectItem value="quitado">Quitado</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {/* Cliente */}
+          <Select value={filters.clientId || "all"} onValueChange={(value) => handleFilterChange("clientId", value)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Todos os clientes" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos os clientes</SelectItem>
+              {clients?.filter((c: any) => c.name && c.name.trim() !== "").map((client: any) => (
+                <SelectItem key={client.id} value={client.id}>
+                  {client.name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
 
           {/* Exportador */}
           <Select value={filters.exporterId || "all"} onValueChange={(value) => handleFilterChange("exporterId", value)}>
             <SelectTrigger>
-              <SelectValue placeholder="Exportador" />
+              <SelectValue placeholder="Todos os exportadores" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos os exportadores</SelectItem>
@@ -237,7 +190,7 @@ export default function FiltersSection({ filters, onFiltersChange }: FiltersProp
           {/* Importador */}
           <Select value={filters.importerId || "all"} onValueChange={(value) => handleFilterChange("importerId", value)}>
             <SelectTrigger>
-              <SelectValue placeholder="Importador" />
+              <SelectValue placeholder="Todos os importadores" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos os importadores</SelectItem>
@@ -251,140 +204,19 @@ export default function FiltersSection({ filters, onFiltersChange }: FiltersProp
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-2 mb-4">
-          <Button 
-            variant="default" 
-            size="sm"
-            className="flex items-center gap-2"
-          >
-            <Search className="h-4 w-4" />
-            Buscar
-          </Button>
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={clearAllFilters}
-            className="flex items-center gap-2"
-          >
-            <X className="h-4 w-4" />
-            Limpiar Filtros
-          </Button>
-        </div>
-
-        {/* Advanced Filters Toggle */}
-        <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
-          <CollapsibleTrigger asChild>
+        {activeFilters.length > 0 && (
+          <div className="flex gap-2 mb-4">
             <Button
               variant="outline"
-              className="w-full mb-4 justify-between"
+              size="sm"
+              onClick={clearAllFilters}
+              className="flex items-center gap-2"
             >
-              <span className="flex items-center">
-                <Filter className="mr-2 h-4 w-4" />
-                Filtros Avançados
-              </span>
-              <span className="text-xs text-gray-500">
-                {isExpanded ? "Ocultar" : "Mostrar"}
-              </span>
+              <X className="h-4 w-4" />
+              Limpar Filtros
             </Button>
-          </CollapsibleTrigger>
-          
-          <CollapsibleContent className="space-y-4">
-            {/* Advanced Text Filters */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Input
-                placeholder="Cliente Rede"
-                value={filters.clienteRede}
-                onChange={(e) => handleFilterChange("clienteRede", e.target.value)}
-              />
-              <Input
-                placeholder="Representante"
-                value={filters.representante}
-                onChange={(e) => handleFilterChange("representante", e.target.value)}
-              />
-              <Input
-                placeholder="Produto"
-                value={filters.produto}
-                onChange={(e) => handleFilterChange("produto", e.target.value)}
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Input
-                placeholder="Referência Exportador"
-                value={filters.referenciaExportador}
-                onChange={(e) => handleFilterChange("referenciaExportador", e.target.value)}
-              />
-              <Input
-                placeholder="Referência Importador"
-                value={filters.referenciaImportador}
-                onChange={(e) => handleFilterChange("referenciaImportador", e.target.value)}
-              />
-              <Input
-                placeholder="Cliente Final"
-                value={filters.clienteFinal}
-                onChange={(e) => handleFilterChange("clienteFinal", e.target.value)}
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Input
-                placeholder="Grupo"
-                value={filters.grupo}
-                onChange={(e) => handleFilterChange("grupo", e.target.value)}
-              />
-              <Input
-                placeholder="País Exportador"
-                value={filters.paisExportador}
-                onChange={(e) => handleFilterChange("paisExportador", e.target.value)}
-              />
-            </div>
-
-            {/* Date Range Filters */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700 flex items-center">
-                  <Calendar className="mr-2 h-4 w-4" />
-                  Data de Emissão
-                </label>
-                <div className="grid grid-cols-2 gap-2">
-                  <Input
-                    type="date"
-                    value={filters.dataEmissaoInicio}
-                    onChange={(e) => handleFilterChange("dataEmissaoInicio", e.target.value)}
-                    placeholder="De"
-                  />
-                  <Input
-                    type="date"
-                    value={filters.dataEmissaoFim}
-                    onChange={(e) => handleFilterChange("dataEmissaoFim", e.target.value)}
-                    placeholder="Até"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700 flex items-center">
-                  <Calendar className="mr-2 h-4 w-4" />
-                  Data de Embarque
-                </label>
-                <div className="grid grid-cols-2 gap-2">
-                  <Input
-                    type="date"
-                    value={filters.dataEmbarqueInicio}
-                    onChange={(e) => handleFilterChange("dataEmbarqueInicio", e.target.value)}
-                    placeholder="De"
-                  />
-                  <Input
-                    type="date"
-                    value={filters.dataEmbarqueFim}
-                    onChange={(e) => handleFilterChange("dataEmbarqueFim", e.target.value)}
-                    placeholder="Até"
-                  />
-                </div>
-              </div>
-            </div>
-          </CollapsibleContent>
-        </Collapsible>
+          </div>
+        )}
 
         {/* Active Filters */}
         {activeFilters.length > 0 && (
@@ -396,17 +228,7 @@ export default function FiltersSection({ filters, onFiltersChange }: FiltersProp
                   key={filter.key}
                   variant="secondary"
                   className="bg-blue-100 text-blue-800 hover:bg-blue-200 cursor-pointer"
-                  onClick={() => {
-                    if (filter.key === "dataEmissao") {
-                      removeFilter("dataEmissaoInicio");
-                      removeFilter("dataEmissaoFim");
-                    } else if (filter.key === "dataEmbarque") {
-                      removeFilter("dataEmbarqueInicio");
-                      removeFilter("dataEmbarqueFim");
-                    } else {
-                      removeFilter(filter.key);
-                    }
-                  }}
+                  onClick={() => removeFilter(filter.key)}
                 >
                   {filter.label}
                   <X className="ml-1 h-3 w-3" />

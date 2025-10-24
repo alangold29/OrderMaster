@@ -65,6 +65,11 @@ async function getOrCreateEntity(
 
 class Storage implements IStorage {
   async getOrders(params: any) {
+    const page = params.page || 1;
+    const limit = params.limit || 10;
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+
     let query = supabase
       .from('orders')
       .select(`
@@ -73,48 +78,42 @@ class Storage implements IStorage {
         importer:importers!orders_importer_id_fkey(id, name),
         client:clients!orders_client_id_fkey(id, name),
         producer:producers!orders_producer_id_fkey(id, name)
-      `);
+      `, { count: 'exact' });
 
-    if (params.search) {
+    if (params.search && params.search.trim()) {
       query = query.or(`pedido.ilike.%${params.search}%,itens.ilike.%${params.search}%`);
     }
 
-    if (params.clientId) {
+    if (params.clientId && params.clientId.trim()) {
       query = query.eq('client_id', params.clientId);
     }
 
-    if (params.exporterId) {
+    if (params.exporterId && params.exporterId.trim()) {
       query = query.eq('exporter_id', params.exporterId);
     }
 
-    if (params.importerId) {
+    if (params.importerId && params.importerId.trim()) {
       query = query.eq('importer_id', params.importerId);
     }
 
-    if (params.producerId) {
+    if (params.producerId && params.producerId.trim()) {
       query = query.eq('producer_id', params.producerId);
     }
 
-    if (params.situacao) {
+    if (params.situacao && params.situacao.trim()) {
       query = query.eq('situacao', params.situacao);
     }
 
-    const page = params.page || 1;
-    const limit = params.limit || 10;
-    const from = (page - 1) * limit;
-    const to = from + limit - 1;
-
-    const { data, error, count } = await supabase
-      .from('orders')
-      .select('*', { count: 'exact', head: true });
-
-    if (error) throw error;
-
-    const { data: orders, error: ordersError } = await query
-      .order(params.sortBy || 'created_at', { ascending: params.sortOrder === 'asc' })
+    const { data: orders, error, count } = await query
+      .order(params.sortBy || 'data', { ascending: params.sortOrder === 'asc' })
       .range(from, to);
 
-    if (ordersError) throw ordersError;
+    if (error) {
+      console.error('Supabase error in getOrders:', error);
+      throw error;
+    }
+
+    console.log(`getOrders: Found ${count} total orders, returning ${orders?.length || 0} for page ${page}`);
 
     return {
       orders: orders || [],
