@@ -88,8 +88,88 @@ class Storage implements IStorage {
       query = query.eq('exporter_id', params.exporterId);
     }
 
+    if (params.importerId) {
+      query = query.eq('importer_id', params.importerId);
+    }
+
+    if (params.producerId) {
+      query = query.eq('producer_id', params.producerId);
+    }
+
     if (params.situacao) {
       query = query.eq('situacao', params.situacao);
+    }
+
+    if (params.clienteRede) {
+      query = query.ilike('cliente_rede', `%${params.clienteRede}%`);
+    }
+
+    if (params.representante) {
+      query = query.ilike('representante', `%${params.representante}%`);
+    }
+
+    if (params.produto) {
+      query = query.ilike('produto', `%${params.produto}%`);
+    }
+
+    if (params.referenciaExportador) {
+      query = query.ilike('referencia_exportador', `%${params.referenciaExportador}%`);
+    }
+
+    if (params.referenciaImportador) {
+      query = query.ilike('referencia_importador', `%${params.referenciaImportador}%`);
+    }
+
+    if (params.clienteFinal) {
+      query = query.ilike('cliente_final', `%${params.clienteFinal}%`);
+    }
+
+    if (params.grupo) {
+      query = query.ilike('grupo', `%${params.grupo}%`);
+    }
+
+    if (params.paisExportador) {
+      query = query.ilike('pais_exportador', `%${params.paisExportador}%`);
+    }
+
+    if (params.dataEmissaoInicio && params.dataEmissaoFim) {
+      query = query.gte('data_emissao_pedido', params.dataEmissaoInicio)
+                   .lte('data_emissao_pedido', params.dataEmissaoFim);
+    }
+
+    if (params.dataEmbarqueInicio && params.dataEmbarqueFim) {
+      query = query.gte('embarque', params.dataEmbarqueInicio)
+                   .lte('embarque', params.dataEmbarqueFim);
+    }
+
+    if (params.dataPedidoInicio && params.dataPedidoFim) {
+      query = query.gte('data', params.dataPedidoInicio)
+                   .lte('data', params.dataPedidoFim);
+    }
+
+    if (params.dataDesembarqueInicio && params.dataDesembarqueFim) {
+      query = query.gte('data_desembarque', params.dataDesembarqueInicio)
+                   .lte('data_desembarque', params.dataDesembarqueFim);
+    }
+
+    if (params.notify) {
+      query = query.ilike('notify', `%${params.notify}%`);
+    }
+
+    if (params.portoEmbarque) {
+      query = query.ilike('porto_embarque', `%${params.portoEmbarque}%`);
+    }
+
+    if (params.portoDesembarque) {
+      query = query.ilike('porto_destino', `%${params.portoDesembarque}%`);
+    }
+
+    if (params.blCrtAwb) {
+      query = query.ilike('bl_crt_awb', `%${params.blCrtAwb}%`);
+    }
+
+    if (params.dataDesembarque) {
+      query = query.eq('data_desembarque', params.dataDesembarque);
     }
 
     const page = params.page || 1;

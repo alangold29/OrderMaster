@@ -57,15 +57,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         dataEmissaoFim,
         dataEmbarqueInicio,
         dataEmbarqueFim,
+        dataPedidoInicio,
+        dataPedidoFim,
+        dataDesembarqueInicio,
+        dataDesembarqueFim,
         notify,
         portoEmbarque,
         portoDesembarque,
         blCrtAwb,
-        dataDesembarque,
         sortBy,
         sortOrder,
       } = req.query;
-      
+
       const result = await storage.getOrders({
         page: parseInt(page as string),
         limit: parseInt(limit as string),
@@ -87,15 +90,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         dataEmissaoFim: dataEmissaoFim as string,
         dataEmbarqueInicio: dataEmbarqueInicio as string,
         dataEmbarqueFim: dataEmbarqueFim as string,
+        dataPedidoInicio: dataPedidoInicio as string,
+        dataPedidoFim: dataPedidoFim as string,
+        dataDesembarqueInicio: dataDesembarqueInicio as string,
+        dataDesembarqueFim: dataDesembarqueFim as string,
         notify: notify as string,
         portoEmbarque: portoEmbarque as string,
         portoDesembarque: portoDesembarque as string,
         blCrtAwb: blCrtAwb as string,
-        dataDesembarque: dataDesembarque as string,
         sortBy: sortBy as string,
         sortOrder: sortOrder as 'asc' | 'desc',
       });
-      
+
       res.json(result);
     } catch (error) {
       console.error("Error fetching orders:", error);
