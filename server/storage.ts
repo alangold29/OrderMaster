@@ -28,7 +28,13 @@ if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL must be set. Did you forget to provision a database?");
 }
 
-const client = postgres(process.env.DATABASE_URL);
+const client = postgres(process.env.DATABASE_URL, {
+  connect_timeout: 30,
+  idle_timeout: 20,
+  max_lifetime: 60 * 30,
+  ssl: { rejectUnauthorized: false },
+  prepare: false,
+});
 const db = drizzle(client);
 
 export interface IStorage {
