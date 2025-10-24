@@ -444,13 +444,37 @@ class Storage implements IStorage {
   }
 
   async createCompanyUser(userData: any) {
+    console.log("Storage: Criando usuário com dados:", userData);
+
+    const { data: existingUser } = await supabase
+      .from('company_users')
+      .select('email')
+      .eq('email', userData.email)
+      .maybeSingle();
+
+    if (existingUser) {
+      throw new Error(`Email duplicado: já existe um usuário com o email ${userData.email}`);
+    }
+
     const { data, error } = await supabase
       .from('company_users')
-      .insert(userData)
+      .insert({
+        email: userData.email,
+        name: userData.name,
+        position: userData.position,
+        role: userData.role || 'viewer',
+        is_active: userData.isActive ?? true,
+        permissions: userData.permissions || {}
+      })
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error("Erro do Supabase ao criar usuário:", error);
+      throw error;
+    }
+
+    console.log("Usuário criado com sucesso:", data);
     return data;
   }
 

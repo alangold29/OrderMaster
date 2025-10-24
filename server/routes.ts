@@ -379,12 +379,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/company-users", async (req, res) => {
     try {
+      console.log("Recebendo requisição para criar usuário:", req.body);
       const userData = req.body;
+
+      if (!userData.email || !userData.name || !userData.position) {
+        return res.status(400).json({
+          error: "Dados inválidos",
+          details: "Email, nome e posição são obrigatórios"
+        });
+      }
+
       const user = await storage.createCompanyUser(userData);
+      console.log("Usuário criado com sucesso:", user.id);
       res.status(201).json(user);
     } catch (error) {
-      console.error("Error creating company user:", error);
-      res.status(500).json({ error: "Failed to create company user" });
+      console.error("Erro ao criar usuário da empresa:", error);
+
+      if (error instanceof Error) {
+        if (error.message.includes("unique") || error.message.includes("duplicate")) {
+          return res.status(409).json({
+            error: "Email duplicado",
+            details: "Já existe um usuário com este email"
+          });
+        }
+      }
+
+      res.status(500).json({
+        error: "Falha ao criar usuário",
+        details: error instanceof Error ? error.message : String(error)
+      });
     }
   });
 

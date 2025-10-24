@@ -26,20 +26,28 @@ export function UserForm({ user, onClose, onSuccess }: UserFormProps) {
 
   const createUserMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      return await apiRequest("/api/company-users", "POST", data);
+      console.log("Enviando dados do usuário:", data);
+      const response = await apiRequest("POST", "/api/company-users", data);
+      const result = await response.json();
+      console.log("Resposta do servidor:", result);
+      return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/company-users"] });
       toast({
-        title: "Usuário criado",
-        description: "O usuário foi criado com sucesso.",
+        title: "Usuário criado com sucesso!",
+        description: "O usuário foi adicionado ao sistema.",
       });
       onSuccess();
     },
-    onError: (error) => {
+    onError: (error: any) => {
+      console.error("Erro ao criar usuário:", error);
+      const errorMessage = error.message || "Falha ao criar o usuário";
       toast({
-        title: "Erro",
-        description: "Falha ao criar o usuário.",
+        title: "Erro ao criar usuário",
+        description: errorMessage.includes("unique") || errorMessage.includes("duplicate")
+          ? "Já existe um usuário com este email."
+          : errorMessage,
         variant: "destructive",
       });
     },
@@ -47,20 +55,25 @@ export function UserForm({ user, onClose, onSuccess }: UserFormProps) {
 
   const updateUserMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      return await apiRequest(`/api/company-users/${user!.id}`, "PUT", data);
+      console.log("Atualizando usuário:", user!.id, data);
+      const response = await apiRequest("PUT", `/api/company-users/${user!.id}`, data);
+      const result = await response.json();
+      console.log("Resposta da atualização:", result);
+      return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/company-users"] });
       toast({
-        title: "Usuário atualizado",
-        description: "O usuário foi atualizado com sucesso.",
+        title: "Usuário atualizado com sucesso!",
+        description: "As informações foram salvas.",
       });
       onSuccess();
     },
-    onError: (error) => {
+    onError: (error: any) => {
+      console.error("Erro ao atualizar usuário:", error);
       toast({
-        title: "Erro",
-        description: "Falha ao atualizar o usuário.",
+        title: "Erro ao atualizar usuário",
+        description: error.message || "Falha ao atualizar o usuário.",
         variant: "destructive",
       });
     },
