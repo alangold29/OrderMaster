@@ -361,12 +361,26 @@ class Storage implements IStorage {
   }
 
   async getFinancialStats() {
-    return {
-      totalReceivable: 0,
-      totalPaid: 0,
-      pendingPayment: 0,
-      overdueAmount: 0,
-    };
+    const { data: orders, error } = await supabase
+      .from('orders')
+      .select('total_guia, situacao');
+
+    if (error) throw error;
+
+    const stats = orders?.reduce((acc, order) => {
+      const amount = parseFloat(order.total_guia || '0');
+      acc.totalReceivable += amount;
+
+      if (order.situacao === 'entregue' || order.situacao === 'quitado') {
+        acc.totalPaid += amount;
+      } else if (order.situacao === 'pendente') {
+        acc.pendingPayment += amount;
+      }
+
+      return acc;
+    }, { totalReceivable: 0, totalPaid: 0, pendingPayment: 0, overdueAmount: 0 }) || { totalReceivable: 0, totalPaid: 0, pendingPayment: 0, overdueAmount: 0 };
+
+    return stats;
   }
 
   async getRecentOrders() {
@@ -491,25 +505,110 @@ class Storage implements IStorage {
   }
 
   async getFinancialSummary() {
+    const { data: orders, error } = await supabase
+      .from('orders')
+      .select('total_guia, situacao');
+
+    if (error) throw error;
+
+    const totalRevenue = orders?.reduce((sum, order) => sum + parseFloat(order.total_guia || '0'), 0) || 0;
+    const totalOrders = orders?.length || 0;
+    const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+
+    const byStatus = orders?.reduce((acc, order) => {
+      const amount = parseFloat(order.total_guia || '0');
+      if (order.situacao === 'pendente') acc.pendente += amount;
+      else if (order.situacao === 'embarcado' || order.situacao === 'em_transito') acc.emTransito += amount;
+      else if (order.situacao === 'entregue' || order.situacao === 'quitado') acc.entregue += amount;
+      return acc;
+    }, { pendente: 0, emTransito: 0, entregue: 0 }) || { pendente: 0, emTransito: 0, entregue: 0 };
+
     return {
-      totalReceivable: 0,
-      totalPaid: 0,
-      pendingPayment: 0,
-      overdueAmount: 0,
+      totalRevenue,
+      totalOrders,
+      averageOrderValue,
+      byStatus,
     };
   }
 
   async getAccountsReceivable() {
-    return [];
+    const { data: orders, error } = await supabase
+      .from('orders')
+      .select(`
+        id,
+        total_guia,
+        situacao,
+        client_id,
+        client:clients!orders_client_id_fkey(id, name)
+      `);
+
+    if (error) throw error;
+
+    const accountsMap = new Map<string, any>();
+
+    orders?.forEach(order => {
+      const clientId = order.client_id;
+      const clientName = order.client?.name || 'Unknown';
+
+      if (!accountsMap.has(clientId)) {
+        accountsMap.set(clientId, {
+          clientId,
+          clientName,
+          totalOrders: 0,
+          totalAmount: 0,
+          pendingOrders: 0,
+          deliveredOrders: 0,
+        });
+      }
+
+      const account = accountsMap.get(clientId);
+      account.totalOrders++;
+      account.totalAmount += parseFloat(order.total_guia || '0');
+
+      if (order.situacao === 'pendente' || order.situacao === 'embarcado' || order.situacao === 'em_transito') {
+        account.pendingOrders++;
+      } else if (order.situacao === 'entregue' || order.situacao === 'quitado') {
+        account.deliveredOrders++;
+      }
+    });
+
+    return Array.from(accountsMap.values()).sort((a, b) => b.totalAmount - a.totalAmount);
   }
 
   async getClientFinancials(clientId: string) {
+    const { data: client, error: clientError } = await supabase
+      .from('clients')
+      .select('id, name')
+      .eq('id', clientId)
+      .maybeSingle();
+
+    if (clientError) throw clientError;
+    if (!client) throw new Error('Client not found');
+
+    const { data: orders, error: ordersError } = await supabase
+      .from('orders')
+      .select(`
+        id,
+        pedido,
+        data,
+        produto,
+        itens,
+        total_guia,
+        situacao
+      `)
+      .eq('client_id', clientId)
+      .order('data', { ascending: false });
+
+    if (ordersError) throw ordersError;
+
+    const totalAmount = orders?.reduce((sum, order) => sum + parseFloat(order.total_guia || '0'), 0) || 0;
+    const totalOrders = orders?.length || 0;
+
     return {
-      clientId,
-      totalOrders: 0,
-      totalValue: 0,
-      paidAmount: 0,
-      pendingAmount: 0,
+      client,
+      orders: orders || [],
+      totalAmount,
+      totalOrders,
     };
   }
 }
