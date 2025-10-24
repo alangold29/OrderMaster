@@ -118,7 +118,7 @@ export default function Contas() {
             ) : (
               <>
                 <div className="text-2xl font-bold text-pending" data-testid="text-pending-value">
-                  {formatCurrency(summary?.byStatus.pendente || 0)}
+                  {formatCurrency(summary?.byStatus?.pendente || 0)}
                 </div>
                 <p className="text-xs text-muted-foreground">Pedidos pendientes</p>
               </>
@@ -137,7 +137,7 @@ export default function Contas() {
             ) : (
               <>
                 <div className="text-2xl font-bold text-delivered" data-testid="text-delivered-value">
-                  {formatCurrency(summary?.byStatus.entregue || 0)}
+                  {formatCurrency(summary?.byStatus?.entregue || 0)}
                 </div>
                 <p className="text-xs text-muted-foreground">Pedidos entregados</p>
               </>
