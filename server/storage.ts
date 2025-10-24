@@ -13,7 +13,6 @@ export interface IStorage {
   getOrders(params: any): Promise<any>;
   getOrderById(id: string): Promise<any>;
   createOrder(data: any): Promise<any>;
-  createManualOrder(data: any): Promise<any>;
   updateOrder(id: string, data: any): Promise<any>;
   deleteOrder(id: string): Promise<void>;
   getClients(): Promise<Client[]>;
@@ -98,78 +97,6 @@ class Storage implements IStorage {
 
     if (params.situacao) {
       query = query.eq('situacao', params.situacao);
-    }
-
-    if (params.clienteRede) {
-      query = query.ilike('cliente_rede', `%${params.clienteRede}%`);
-    }
-
-    if (params.representante) {
-      query = query.ilike('representante', `%${params.representante}%`);
-    }
-
-    if (params.produto) {
-      query = query.ilike('produto', `%${params.produto}%`);
-    }
-
-    if (params.referenciaExportador) {
-      query = query.ilike('referencia_exportador', `%${params.referenciaExportador}%`);
-    }
-
-    if (params.referenciaImportador) {
-      query = query.ilike('referencia_importador', `%${params.referenciaImportador}%`);
-    }
-
-    if (params.clienteFinal) {
-      query = query.ilike('cliente_final', `%${params.clienteFinal}%`);
-    }
-
-    if (params.grupo) {
-      query = query.ilike('grupo', `%${params.grupo}%`);
-    }
-
-    if (params.paisExportador) {
-      query = query.ilike('pais_exportador', `%${params.paisExportador}%`);
-    }
-
-    if (params.dataEmissaoInicio && params.dataEmissaoFim) {
-      query = query.gte('data_emissao_pedido', params.dataEmissaoInicio)
-                   .lte('data_emissao_pedido', params.dataEmissaoFim);
-    }
-
-    if (params.dataEmbarqueInicio && params.dataEmbarqueFim) {
-      query = query.gte('embarque', params.dataEmbarqueInicio)
-                   .lte('embarque', params.dataEmbarqueFim);
-    }
-
-    if (params.dataPedidoInicio && params.dataPedidoFim) {
-      query = query.gte('data', params.dataPedidoInicio)
-                   .lte('data', params.dataPedidoFim);
-    }
-
-    if (params.dataDesembarqueInicio && params.dataDesembarqueFim) {
-      query = query.gte('data_desembarque', params.dataDesembarqueInicio)
-                   .lte('data_desembarque', params.dataDesembarqueFim);
-    }
-
-    if (params.notify) {
-      query = query.ilike('notify', `%${params.notify}%`);
-    }
-
-    if (params.portoEmbarque) {
-      query = query.ilike('porto_embarque', `%${params.portoEmbarque}%`);
-    }
-
-    if (params.portoDesembarque) {
-      query = query.ilike('porto_destino', `%${params.portoDesembarque}%`);
-    }
-
-    if (params.blCrtAwb) {
-      query = query.ilike('bl_crt_awb', `%${params.blCrtAwb}%`);
-    }
-
-    if (params.dataDesembarque) {
-      query = query.eq('data_desembarque', params.dataDesembarque);
     }
 
     const page = params.page || 1;
@@ -260,30 +187,12 @@ class Storage implements IStorage {
         observacao: orderData.observacao,
         situacao: orderData.situacao || 'pendente',
         semana: orderData.semana,
-        cliente_rede: orderData.clienteRede,
-        representante: orderData.representante,
-        produto: orderData.produto,
-        data_emissao_pedido: orderData.dataEmissaoPedido,
-        cliente_final: orderData.clienteFinal,
-        data_embarque_de: orderData.dataEmbarqueDe,
-        grupo: orderData.grupo,
-        pais_exportador: orderData.paisExportador,
       })
       .select()
       .single();
 
     if (error) throw error;
     return data;
-  }
-
-  async createManualOrder(orderData: any) {
-    return this.createOrder({
-      ...orderData,
-      pedido: orderData.pedido || `ORD-${Date.now()}`,
-      data: orderData.dataEmissaoPedido,
-      quantidade: '0',
-      clientName: 'Cliente General',
-    });
   }
 
   async updateOrder(id: string, data: any) {
@@ -619,7 +528,6 @@ class Storage implements IStorage {
         id,
         pedido,
         data,
-        produto,
         itens,
         total_guia,
         situacao

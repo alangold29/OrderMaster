@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertOrderSchema, manualOrderSchema, type ManualOrder } from "@shared/schema";
+import { insertOrderSchema } from "@shared/schema";
 import multer from "multer";
 import * as XLSX from "xlsx";
 
@@ -45,26 +45,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         importerId,
         producerId,
         situacao,
-        clienteRede,
-        representante,
-        produto,
-        referenciaExportador,
-        referenciaImportador,
-        clienteFinal,
-        grupo,
-        paisExportador,
-        dataEmissaoInicio,
-        dataEmissaoFim,
-        dataEmbarqueInicio,
-        dataEmbarqueFim,
-        dataPedidoInicio,
-        dataPedidoFim,
-        dataDesembarqueInicio,
-        dataDesembarqueFim,
-        notify,
-        portoEmbarque,
-        portoDesembarque,
-        blCrtAwb,
         sortBy,
         sortOrder,
       } = req.query;
@@ -78,26 +58,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         importerId: importerId as string,
         producerId: producerId as string,
         situacao: situacao as string,
-        clienteRede: clienteRede as string,
-        representante: representante as string,
-        produto: produto as string,
-        referenciaExportador: referenciaExportador as string,
-        referenciaImportador: referenciaImportador as string,
-        clienteFinal: clienteFinal as string,
-        grupo: grupo as string,
-        paisExportador: paisExportador as string,
-        dataEmissaoInicio: dataEmissaoInicio as string,
-        dataEmissaoFim: dataEmissaoFim as string,
-        dataEmbarqueInicio: dataEmbarqueInicio as string,
-        dataEmbarqueFim: dataEmbarqueFim as string,
-        dataPedidoInicio: dataPedidoInicio as string,
-        dataPedidoFim: dataPedidoFim as string,
-        dataDesembarqueInicio: dataDesembarqueInicio as string,
-        dataDesembarqueFim: dataDesembarqueFim as string,
-        notify: notify as string,
-        portoEmbarque: portoEmbarque as string,
-        portoDesembarque: portoDesembarque as string,
-        blCrtAwb: blCrtAwb as string,
         sortBy: sortBy as string,
         sortOrder: sortOrder as 'asc' | 'desc',
       });
@@ -124,15 +84,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/orders", async (req, res) => {
     try {
-      if (req.body.produto && req.body.dataEmissaoPedido) {
-        const validatedData = manualOrderSchema.parse(req.body);
-        const order = await storage.createManualOrder(validatedData);
-        res.status(201).json(order);
-      } else {
-        const validatedData = insertOrderSchema.parse(req.body);
-        const order = await storage.createOrder(validatedData);
-        res.status(201).json(order);
-      }
+      const validatedData = insertOrderSchema.parse(req.body);
+      const order = await storage.createOrder(validatedData);
+      res.status(201).json(order);
     } catch (error) {
       console.error("Error creating order:", error);
 

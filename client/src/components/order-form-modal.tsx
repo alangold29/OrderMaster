@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { manualOrderSchema, type ManualOrder } from "@shared/schema";
+import { insertOrderSchema, type InsertOrder } from "@shared/schema";
 import { X, CheckCircle2 } from "lucide-react";
 import {
   Dialog,
@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -44,33 +43,39 @@ export default function OrderFormModal({ isOpen, onClose }: OrderFormModalProps)
   const queryClient = useQueryClient();
   const [openExporter, setOpenExporter] = useState(false);
   const [openImporter, setOpenImporter] = useState(false);
-  
-  const form = useForm<ManualOrder>({
-    resolver: zodResolver(manualOrderSchema),
+  const [openClient, setOpenClient] = useState(false);
+  const [openProducer, setOpenProducer] = useState(false);
+
+  const form = useForm<InsertOrder>({
+    resolver: zodResolver(insertOrderSchema),
     defaultValues: {
+      pedido: "",
+      data: "",
       exporterName: "",
       importerName: "",
-      clienteRede: "",
-      representante: "",
-      produto: "",
-      dataEmissaoPedido: "",
-      situacao: "pendente",
-      pedido: "",
+      clientName: "",
+      producerName: "",
+      quantidade: "",
       referenciaExportador: "",
       referenciaImportador: "",
-      clienteFinal: "",
-      dataEmbarqueDe: "",
-      grupo: "",
-      paisExportador: "",
+      situacao: "pendente",
     },
   });
 
-  const { data: exporters, isLoading: loadingExporters } = useQuery<any[]>({
+  const { data: exporters } = useQuery<any[]>({
     queryKey: ["/api/exporters"],
   });
 
-  const { data: importers, isLoading: loadingImporters } = useQuery<any[]>({
+  const { data: importers } = useQuery<any[]>({
     queryKey: ["/api/importers"],
+  });
+
+  const { data: clients } = useQuery<any[]>({
+    queryKey: ["/api/clients"],
+  });
+
+  const { data: producers } = useQuery<any[]>({
+    queryKey: ["/api/producers"],
   });
 
   const exportersList = useMemo(() => {
@@ -81,8 +86,16 @@ export default function OrderFormModal({ isOpen, onClose }: OrderFormModalProps)
     return importers?.filter((i: any) => i.name && i.name.trim() !== "") || [];
   }, [importers]);
 
+  const clientsList = useMemo(() => {
+    return clients?.filter((c: any) => c.name && c.name.trim() !== "") || [];
+  }, [clients]);
+
+  const producersList = useMemo(() => {
+    return producers?.filter((p: any) => p.name && p.name.trim() !== "") || [];
+  }, [producers]);
+
   const createOrderMutation = useMutation({
-    mutationFn: async (data: ManualOrder) => {
+    mutationFn: async (data: InsertOrder) => {
       const response = await apiRequest("POST", "/api/orders", data);
       return response.json();
     },
@@ -90,11 +103,9 @@ export default function OrderFormModal({ isOpen, onClose }: OrderFormModalProps)
       queryClient.invalidateQueries({ queryKey: ["orders"] });
       queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
       queryClient.invalidateQueries({ queryKey: ["/api/stats"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/exporters"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/importers"] });
       toast({
         title: "Pedido criado com sucesso!",
-        description: `O pedido foi adicionado ao sistema e está visível em todas as seções.`,
+        description: "O pedido foi adicionado ao sistema.",
         duration: 4000,
       });
       form.reset();
@@ -114,7 +125,7 @@ export default function OrderFormModal({ isOpen, onClose }: OrderFormModalProps)
     },
   });
 
-  const onSubmit = (data: ManualOrder) => {
+  const onSubmit = (data: InsertOrder) => {
     createOrderMutation.mutate(data);
   };
 
@@ -139,16 +150,15 @@ export default function OrderFormModal({ isOpen, onClose }: OrderFormModalProps)
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Primera fila - Información básica */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <FormField
                 control={form.control}
                 name="pedido"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Pedido ou ano *</FormLabel>
+                    <FormLabel>Pedido *</FormLabel>
                     <FormControl>
-                      <Input placeholder="Ex: 2024/001" {...field} />
+                      <Input placeholder="Ex: 01123/24" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -157,10 +167,10 @@ export default function OrderFormModal({ isOpen, onClose }: OrderFormModalProps)
 
               <FormField
                 control={form.control}
-                name="dataEmissaoPedido"
+                name="data"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Data de emissão do pedido *</FormLabel>
+                    <FormLabel>Data *</FormLabel>
                     <FormControl>
                       <Input type="date" {...field} />
                     </FormControl>
@@ -171,30 +181,19 @@ export default function OrderFormModal({ isOpen, onClose }: OrderFormModalProps)
 
               <FormField
                 control={form.control}
-                name="situacao"
+                name="quantidade"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Situação *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione..." />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="pendente">Pendente</SelectItem>
-                        <SelectItem value="em-transito">Em Trânsito</SelectItem>
-                        <SelectItem value="entregue">Entregue</SelectItem>
-                        <SelectItem value="cancelado">Cancelado</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <FormLabel>Quantidade *</FormLabel>
+                    <FormControl>
+                      <Input type="number" placeholder="0" {...field} />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
 
-            {/* Segunda fila - Exportador e Importador */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
@@ -309,17 +308,58 @@ export default function OrderFormModal({ isOpen, onClose }: OrderFormModalProps)
               />
             </div>
 
-            {/* Tercera fila - Cliente e Representante */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="clienteRede"
+                name="clientName"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Cliente Rede</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Nome do cliente rede" {...field} />
-                    </FormControl>
+                  <FormItem className="flex flex-col">
+                    <FormLabel>Cliente *</FormLabel>
+                    <Popover open={openClient} onOpenChange={setOpenClient}>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            className={cn(
+                              "w-full justify-between",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value || "Selecione ou digite um cliente..."}
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-full p-0">
+                        <Command>
+                          <CommandInput
+                            placeholder="Buscar ou criar cliente..."
+                            onValueChange={(value) => field.onChange(value)}
+                          />
+                          <CommandEmpty>Nenhum cliente encontrado.</CommandEmpty>
+                          <CommandGroup>
+                            {clientsList.map((client: any) => (
+                              <CommandItem
+                                key={client.id}
+                                value={client.name}
+                                onSelect={() => {
+                                  field.onChange(client.name);
+                                  setOpenClient(false);
+                                }}
+                              >
+                                <CheckCircle2
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    field.value === client.name ? "opacity-100" : "opacity-0"
+                                  )}
+                                />
+                                {client.name}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -327,51 +367,61 @@ export default function OrderFormModal({ isOpen, onClose }: OrderFormModalProps)
 
               <FormField
                 control={form.control}
-                name="representante"
+                name="producerName"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Representante</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Nome do representante" {...field} />
-                    </FormControl>
+                  <FormItem className="flex flex-col">
+                    <FormLabel>Produtor</FormLabel>
+                    <Popover open={openProducer} onOpenChange={setOpenProducer}>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            className={cn(
+                              "w-full justify-between",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value || "Selecione ou digite um produtor..."}
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-full p-0">
+                        <Command>
+                          <CommandInput
+                            placeholder="Buscar ou criar produtor..."
+                            onValueChange={(value) => field.onChange(value)}
+                          />
+                          <CommandEmpty>Nenhum produtor encontrado.</CommandEmpty>
+                          <CommandGroup>
+                            {producersList.map((producer: any) => (
+                              <CommandItem
+                                key={producer.id}
+                                value={producer.name}
+                                onSelect={() => {
+                                  field.onChange(producer.name);
+                                  setOpenProducer(false);
+                                }}
+                              >
+                                <CheckCircle2
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    field.value === producer.name ? "opacity-100" : "opacity-0"
+                                  )}
+                                />
+                                {producer.name}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
 
-            {/* Cuarta fila - Produto e Cliente Final */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="produto"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Produto *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Descrição do produto" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="clienteFinal"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Cliente Final</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Nome do cliente final" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            {/* Quinta fila - Referencias */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
@@ -402,52 +452,31 @@ export default function OrderFormModal({ isOpen, onClose }: OrderFormModalProps)
               />
             </div>
 
-            {/* Sexta fila - Data embarque e Grupo */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <FormField
-                control={form.control}
-                name="dataEmbarqueDe"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Data de embarque de</FormLabel>
+            <FormField
+              control={form.control}
+              name="situacao"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Situação *</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
-                      <Input type="date" {...field} />
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione..." />
+                      </SelectTrigger>
                     </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                    <SelectContent>
+                      <SelectItem value="pendente">Pendente</SelectItem>
+                      <SelectItem value="em-transito">Em Trânsito</SelectItem>
+                      <SelectItem value="entregue">Entregue</SelectItem>
+                      <SelectItem value="quitado">Quitado</SelectItem>
+                      <SelectItem value="cancelado">Cancelado</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              <FormField
-                control={form.control}
-                name="grupo"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Grupo</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Grupo" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="paisExportador"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>País Exportador</FormLabel>
-                    <FormControl>
-                      <Input placeholder="País de origem" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            {/* Buttons */}
             <div className="flex justify-end space-x-3 pt-6">
               <Button type="button" variant="outline" onClick={onClose}>
                 Cancelar
