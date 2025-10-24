@@ -379,11 +379,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/company-users", async (req, res) => {
     try {
+      console.log("POST /api/company-users - Body:", JSON.stringify(req.body));
       const user = await storage.createCompanyUser(req.body);
+      console.log("User created:", user);
       res.status(201).json(user);
     } catch (error: any) {
-      console.error("Error:", error);
-      res.status(500).json({ error: "Failed to create company user" });
+      console.error("ERROR COMPLETO:", error);
+      console.error("ERROR STACK:", error?.stack);
+      res.status(500).json({
+        error: "Failed to create company user",
+        message: error?.message,
+        details: String(error)
+      });
     }
   });
 

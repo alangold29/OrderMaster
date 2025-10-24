@@ -444,20 +444,31 @@ class Storage implements IStorage {
   }
 
   async createCompanyUser(userData: any) {
+    console.log("storage.createCompanyUser - INPUT:", JSON.stringify(userData));
+
+    const insertData = {
+      email: userData.email,
+      name: userData.name,
+      position: userData.position,
+      role: userData.role || 'viewer',
+      is_active: userData.isActive ?? true,
+      permissions: userData.permissions || {}
+    };
+
+    console.log("storage.createCompanyUser - INSERTING:", JSON.stringify(insertData));
+
     const { data, error } = await supabase
       .from('company_users')
-      .insert({
-        email: userData.email,
-        name: userData.name,
-        position: userData.position,
-        role: userData.role || 'viewer',
-        is_active: userData.isActive ?? true,
-        permissions: userData.permissions || {}
-      })
+      .insert(insertData)
       .select()
       .single();
 
-    if (error) throw error;
+    console.log("storage.createCompanyUser - RESULT:", { data, error });
+
+    if (error) {
+      console.error("SUPABASE ERROR:", JSON.stringify(error));
+      throw error;
+    }
     return data;
   }
 
