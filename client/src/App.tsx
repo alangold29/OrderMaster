@@ -4,8 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
-import { BarChart3, Package, Ship, CreditCard, Database, Users } from "lucide-react";
-import logoPath from "@assets/Logo CGM_1755701171258.png";
+import { BarChart3, Package, Ship, CreditCard, Database, Users, Building2 } from "lucide-react";
 import Dashboard from "@/pages/analytics";
 import Pedidos from "@/pages/dashboard";
 import Embarques from "@/pages/embarques";
@@ -26,11 +25,9 @@ function Router() {
         {/* Logo and Title */}
         <div className="border-b p-6">
           <div className="flex items-center gap-3">
-            <img 
-              src={logoPath} 
-              alt="Logo CGM" 
-              className="h-10 w-10 object-contain"
-            />
+            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Building2 className="h-6 w-6 text-primary" />
+            </div>
             <h1 className="text-lg font-bold text-primary">CRM Importação</h1>
           </div>
         </div>
