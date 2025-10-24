@@ -38,8 +38,8 @@ interface EmbarquesFiltersProps {
 export default function EmbarquesFilters({ filters, onFiltersChange }: EmbarquesFiltersProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   
-  const { data: exporters } = useQuery({ queryKey: ["/api/exporters"] });
-  const { data: importers } = useQuery({ queryKey: ["/api/importers"] });
+  const { data: exporters } = useQuery<any[]>({ queryKey: ["/api/exporters"] });
+  const { data: importers } = useQuery<any[]>({ queryKey: ["/api/importers"] });
 
   const handleFilterChange = (key: string, value: string) => {
     const finalValue = value === "all" ? "" : value;

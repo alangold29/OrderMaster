@@ -3,7 +3,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ShoppingCart, Clock, Truck, CheckCircle } from "lucide-react";
 
 export default function DashboardStats() {
-  const { data: stats, isLoading } = useQuery({
+  const { data: stats, isLoading } = useQuery<{
+    total: number;
+    pendente: number;
+    emTransito: number;
+    entregue: number;
+    quitado: number;
+  }>({
     queryKey: ["/api/stats"],
   });
 

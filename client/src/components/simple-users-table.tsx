@@ -281,7 +281,7 @@ export function SimpleUsersTable() {
       {/* User Form Modal */}
       {showForm && (
         <UserForm
-          user={selectedUser}
+          user={selectedUser || undefined}
           onClose={() => {
             setShowForm(false);
             setSelectedUser(null);

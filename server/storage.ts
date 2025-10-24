@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/neon-http";
 import { neon } from "@neondatabase/serverless";
-import { eq, like, and, or, desc, asc, count, sum, isNotNull, gte } from "drizzle-orm";
+import { eq, like, and, or, desc, asc, count, sum, isNotNull, gte, lte } from "drizzle-orm";
 import {
   orders,
   clients,
@@ -247,7 +247,7 @@ export class DatabaseStorage implements IStorage {
       whereConditions.push(
         and(
           gte(orders.dataEmissaoPedido, params.dataEmissaoInicio),
-          gte(params.dataEmissaoFim, orders.dataEmissaoPedido)
+          lte(orders.dataEmissaoPedido, params.dataEmissaoFim)
         )
       );
     }
@@ -315,7 +315,7 @@ export class DatabaseStorage implements IStorage {
       .leftJoin(producers, eq(orders.producerId, producers.id))
       .where(whereClause)
       .orderBy(orderBy)
-      .limit(params.limit)
+      .limit(limit)
       .offset(offset),
       
       db.select({ count: count() })

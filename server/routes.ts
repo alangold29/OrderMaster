@@ -131,7 +131,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     } catch (error) {
       console.error("Error creating order:", error);
-      res.status(400).json({ error: "Invalid order data", details: error.message });
+      res.status(400).json({ error: "Invalid order data", details: error instanceof Error ? error.message : String(error) });
     }
   });
 
@@ -311,7 +311,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const order = await storage.createOrder(validatedData);
           orders.push(order);
         } catch (error) {
-          errors.push({ row: i + 1, error: error.message });
+          errors.push({ row: i + 1, error: error instanceof Error ? error.message : String(error) });
         }
       }
 

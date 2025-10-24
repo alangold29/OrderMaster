@@ -55,7 +55,7 @@ export default function CompleteDataTable({
 
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
-  const { data: ordersData, isLoading } = useQuery({
+  const { data: ordersData, isLoading } = useQuery<{ orders: any[]; total: number }>({
     queryKey: [
       "/api/orders",
       filters.page,
@@ -71,10 +71,10 @@ export default function CompleteDataTable({
     ],
   });
 
-  const { data: exporters } = useQuery({ queryKey: ["/api/exporters"] });
-  const { data: importers } = useQuery({ queryKey: ["/api/importers"] });
-  const { data: clients } = useQuery({ queryKey: ["/api/clients"] });
-  const { data: producers } = useQuery({ queryKey: ["/api/producers"] });
+  const { data: exporters } = useQuery<any[]>({ queryKey: ["/api/exporters"] });
+  const { data: importers } = useQuery<any[]>({ queryKey: ["/api/importers"] });
+  const { data: clients } = useQuery<any[]>({ queryKey: ["/api/clients"] });
+  const { data: producers } = useQuery<any[]>({ queryKey: ["/api/producers"] });
 
   const handleSort = (column: string) => {
     const newSortOrder = 

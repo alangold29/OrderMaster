@@ -61,11 +61,11 @@ export default function OrderFormModal({ isOpen, onClose }: OrderFormModalProps)
   });
 
   // Fetch data for dropdowns
-  const { data: exporters } = useQuery({
+  const { data: exporters } = useQuery<any[]>({
     queryKey: ["/api/exporters"],
   });
 
-  const { data: importers } = useQuery({
+  const { data: importers } = useQuery<any[]>({
     queryKey: ["/api/importers"],
   });
 

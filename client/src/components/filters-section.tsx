@@ -38,10 +38,10 @@ interface FiltersProps {
 export default function FiltersSection({ filters, onFiltersChange }: FiltersProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   
-  const { data: clients } = useQuery({ queryKey: ["/api/clients"] });
-  const { data: exporters } = useQuery({ queryKey: ["/api/exporters"] });
-  const { data: importers } = useQuery({ queryKey: ["/api/importers"] });
-  const { data: producers } = useQuery({ queryKey: ["/api/producers"] });
+  const { data: clients } = useQuery<any[]>({ queryKey: ["/api/clients"] });
+  const { data: exporters } = useQuery<any[]>({ queryKey: ["/api/exporters"] });
+  const { data: importers } = useQuery<any[]>({ queryKey: ["/api/importers"] });
+  const { data: producers } = useQuery<any[]>({ queryKey: ["/api/producers"] });
 
   const handleFilterChange = (key: string, value: string) => {
     const finalValue = value === "all" ? "" : value;
