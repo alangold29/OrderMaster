@@ -142,8 +142,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/orders/:id", async (req, res) => {
     try {
-      const validatedData = updateOrderSchema.parse(req.body);
-      const order = await storage.updateOrder(req.params.id, validatedData);
+      console.log("PUT /api/orders/:id - Body:", JSON.stringify(req.body));
+      const order = await storage.updateOrder(req.params.id, req.body);
       res.json(order);
     } catch (error) {
       console.error("Error updating order:", error);
