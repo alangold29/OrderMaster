@@ -4,13 +4,14 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
-import { BarChart3, Package, Ship, CreditCard, Database, Users, Building2 } from "lucide-react";
+import { BarChart3, Package, Ship, CreditCard, Database, Users, Building2, Upload } from "lucide-react";
 import Dashboard from "@/pages/analytics";
 import Pedidos from "@/pages/dashboard";
 import Embarques from "@/pages/embarques";
 import CompleteData from "@/pages/complete-data";
 import Contas from "@/pages/contas";
 import Usuarios from "@/pages/usuarios";
+import ImportarManual from "@/pages/importar-manual";
 import NotFound from "@/pages/not-found";
 import { useCurrentUser } from "@/hooks/use-current-user";
 
@@ -79,9 +80,20 @@ function Router() {
                 Base de Dados
               </Button>
             </Link>
+            <Link href="/importar">
+              <Button
+                variant={location === "/importar" ? "default" : "ghost"}
+                size="default"
+                className="w-full justify-start gap-3 px-4"
+                data-testid="link-importar"
+              >
+                <Upload className="h-4 w-4" />
+                Importar Manual
+              </Button>
+            </Link>
             {canAccessFinancials && (
               <Link href="/contas">
-                <Button 
+                <Button
                   variant={location === "/contas" ? "default" : "ghost"}
                   size="default"
                   className="w-full justify-start gap-3 px-4"
@@ -115,6 +127,7 @@ function Router() {
             <Route path="/pedidos" component={Pedidos} />
             <Route path="/embarques" component={Embarques} />
             <Route path="/dados" component={CompleteData} />
+            <Route path="/importar" component={ImportarManual} />
             <Route path="/contas" component={Contas} />
             <Route path="/usuarios" component={Usuarios} />
             <Route component={NotFound} />

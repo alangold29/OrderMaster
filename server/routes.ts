@@ -284,13 +284,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       for (let i = 0; i < data.length; i++) {
         try {
           const row = data[i] as any;
-          
+
           // Map Excel columns to our schema
           // Handle the fact that there are two REFERÊNCIA columns in the Excel
           const rowKeys = Object.keys(row);
           const referenciaExportador = rowKeys.find(key => key.includes('REFERÊNCIA') && rowKeys.indexOf(key) < rowKeys.indexOf('IMPORTADOR')) || 'REFERÊNCIA';
           const referenciaImportador = rowKeys.find(key => key.includes('REFERÊNCIA') && rowKeys.indexOf(key) > rowKeys.indexOf('IMPORTADOR')) || 'REFERÊNCIA__1';
-          
+
           // Helper function to convert values to strings and handle dates
           const toString = (value: any) => {
             if (value === null || value === undefined) return "";
@@ -351,6 +351,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error importing Excel:", error);
       res.status(500).json({ error: "Failed to import Excel file" });
+    }
+  });
+
+  // Manual import from text data
+  app.post("/api/import/manual", async (req, res) => {
+    try {
+      const { orders: ordersData } = req.body;
+
+      if (!ordersData || !Array.isArray(ordersData)) {
+        return res.status(400).json({ error: "Invalid data format" });
+      }
+
+      const results = [];
+      let successful = 0;
+      let failed = 0;
+
+      for (let i = 0; i < ordersData.length; i++) {
+        try {
+          const orderData = ordersData[i];
+          const validatedData = insertOrderSchema.parse(orderData);
+          const order = await storage.createOrder(validatedData);
+
+          results.push({
+            row: i + 1,
+            pedido: orderData.pedido,
+            success: true,
+          });
+          successful++;
+        } catch (error) {
+          results.push({
+            row: i + 1,
+            pedido: ordersData[i]?.pedido || `Fila ${i + 1}`,
+            success: false,
+            error: error instanceof Error ? error.message : String(error),
+          });
+          failed++;
+        }
+      }
+
+      console.log(`Manual import completed: ${successful} orders imported, ${failed} errors`);
+      res.json({
+        total: ordersData.length,
+        successful,
+        failed,
+        results,
+      });
+    } catch (error) {
+      console.error("Error importing manual data:", error);
+      res.status(500).json({ error: "Failed to import manual data" });
     }
   });
 
