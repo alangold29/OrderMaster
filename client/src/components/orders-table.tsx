@@ -1,9 +1,12 @@
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Edit, Trash2, ArrowUpDown } from "lucide-react";
+import OrderFormModal from "@/components/order-form-modal";
+import type { OrderWithRelations } from "@shared/schema";
 import {
   Table,
   TableBody,
@@ -40,6 +43,18 @@ interface OrdersTableProps {
 export default function OrdersTable({ filters, onFiltersChange }: OrdersTableProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [editingOrder, setEditingOrder] = useState<OrderWithRelations | undefined>(undefined);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  const handleEdit = (order: OrderWithRelations) => {
+    setEditingOrder(order);
+    setIsEditModalOpen(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setIsEditModalOpen(false);
+    setEditingOrder(undefined);
+  };
 
   const deleteOrderMutation = useMutation({
     mutationFn: async (orderId: string) => {
@@ -259,6 +274,7 @@ export default function OrdersTable({ filters, onFiltersChange }: OrdersTablePro
                       variant="ghost"
                       size="sm"
                       className="text-primary hover:text-blue-700"
+                      onClick={() => handleEdit(order)}
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
@@ -344,6 +360,12 @@ export default function OrdersTable({ filters, onFiltersChange }: OrdersTablePro
           </Pagination>
         </div>
       </div>
+      {/* Edit Modal */}
+      <OrderFormModal
+        isOpen={isEditModalOpen}
+        onClose={handleCloseEditModal}
+        order={editingOrder}
+      />
     </>
   );
 }

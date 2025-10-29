@@ -102,6 +102,7 @@ export default function Dashboard() {
       <OrderFormModal
         isOpen={isOrderModalOpen}
         onClose={() => setIsOrderModalOpen(false)}
+        order={undefined}
       />
       
       <FileUploadModal

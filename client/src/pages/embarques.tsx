@@ -137,6 +137,7 @@ export default function Embarques() {
       <OrderFormModal
         isOpen={isOrderModalOpen}
         onClose={() => setIsOrderModalOpen(false)}
+        order={undefined}
       />
     </div>
   );

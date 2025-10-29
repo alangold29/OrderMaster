@@ -142,12 +142,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/orders/:id", async (req, res) => {
     try {
-      const validatedData = insertOrderSchema.partial().parse(req.body);
+      const validatedData = insertOrderSchema.parse(req.body);
       const order = await storage.updateOrder(req.params.id, validatedData);
       res.json(order);
     } catch (error) {
       console.error("Error updating order:", error);
-      res.status(400).json({ error: "Invalid order data" });
+
+      if (error instanceof Error) {
+        if (error.message.includes("unique") || error.message.includes("duplicate")) {
+          return res.status(409).json({
+            error: "Pedido duplicado",
+            details: "Já existe um pedido com este número"
+          });
+        }
+
+        if (error.message.includes("validation") || error.message.includes("invalid")) {
+          return res.status(400).json({
+            error: "Dados inválidos",
+            details: error.message
+          });
+        }
+      }
+
+      res.status(500).json({
+        error: "Erro ao atualizar pedido",
+        details: error instanceof Error ? error.message : String(error)
+      });
     }
   });
 
