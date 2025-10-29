@@ -220,12 +220,81 @@ class Storage implements IStorage {
     return data;
   }
 
-  async updateOrder(id: string, data: any) {
+  async updateOrder(id: string, orderData: any) {
+    const { data: existingOrder } = await supabase
+      .from('orders')
+      .select('id, pedido')
+      .eq('id', id)
+      .maybeSingle();
+
+    if (!existingOrder) {
+      throw new Error('Pedido no encontrado');
+    }
+
+    if (orderData.pedido && orderData.pedido !== existingOrder.pedido) {
+      const { data: duplicateOrder } = await supabase
+        .from('orders')
+        .select('id, pedido')
+        .eq('pedido', orderData.pedido)
+        .neq('id', id)
+        .maybeSingle();
+
+      if (duplicateOrder) {
+        throw new Error(`Pedido duplicado: ya existe un pedido con el número ${orderData.pedido}`);
+      }
+    }
+
+    const clientId = orderData.clientName
+      ? await getOrCreateEntity('clients', orderData.clientName)
+      : undefined;
+    const exporterId = orderData.exporterName
+      ? await getOrCreateEntity('exporters', orderData.exporterName)
+      : undefined;
+    const importerId = orderData.importerName
+      ? await getOrCreateEntity('importers', orderData.importerName)
+      : undefined;
+    const producerId = orderData.producerName
+      ? await getOrCreateEntity('producers', orderData.producerName)
+      : null;
+
+    const updatePayload: any = {};
+
+    if (orderData.pedido !== undefined) updatePayload.pedido = orderData.pedido;
+    if (orderData.data !== undefined) updatePayload.data = orderData.data;
+    if (exporterId !== undefined) updatePayload.exporter_id = exporterId;
+    if (orderData.referenciaExportador !== undefined) updatePayload.referencia_exportador = orderData.referenciaExportador;
+    if (importerId !== undefined) updatePayload.importer_id = importerId;
+    if (orderData.referenciaImportador !== undefined) updatePayload.referencia_importador = orderData.referenciaImportador;
+    if (orderData.quantidade !== undefined) updatePayload.quantidade = orderData.quantidade;
+    if (orderData.itens !== undefined) updatePayload.itens = orderData.itens;
+    if (orderData.precoGuia !== undefined) updatePayload.preco_guia = orderData.precoGuia;
+    if (orderData.totalGuia !== undefined) updatePayload.total_guia = orderData.totalGuia;
+    if (producerId !== undefined) updatePayload.producer_id = producerId;
+    if (clientId !== undefined) updatePayload.client_id = clientId;
+    if (orderData.etiqueta !== undefined) updatePayload.etiqueta = orderData.etiqueta;
+    if (orderData.portoEmbarque !== undefined) updatePayload.porto_embarque = orderData.portoEmbarque;
+    if (orderData.portoDestino !== undefined) updatePayload.porto_destino = orderData.portoDestino;
+    if (orderData.condicao !== undefined) updatePayload.condicao = orderData.condicao;
+    if (orderData.embarque !== undefined) updatePayload.embarque = orderData.embarque;
+    if (orderData.previsao !== undefined) updatePayload.previsao = orderData.previsao;
+    if (orderData.chegada !== undefined) updatePayload.chegada = orderData.chegada;
+    if (orderData.observacao !== undefined) updatePayload.observacao = orderData.observacao;
+    if (orderData.situacao !== undefined) updatePayload.situacao = orderData.situacao;
+    if (orderData.semana !== undefined) updatePayload.semana = orderData.semana;
+
+    updatePayload.updated_at = new Date().toISOString();
+
     const { data: updated, error } = await supabase
       .from('orders')
-      .update(data)
+      .update(updatePayload)
       .eq('id', id)
-      .select()
+      .select(`
+        *,
+        exporter:exporters!orders_exporter_id_fkey(id, name),
+        importer:importers!orders_importer_id_fkey(id, name),
+        client:clients!orders_client_id_fkey(id, name),
+        producer:producers!orders_producer_id_fkey(id, name)
+      `)
       .single();
 
     if (error) throw error;
