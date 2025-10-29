@@ -5,10 +5,9 @@ import { CalendarDays, DollarSign, Package, TrendingUp, AlertTriangle, Clock } f
 
 interface OrderStats {
   total: number;
-  pendente: number;
-  emTransito: number;
-  entregue: number;
-  quitado: number;
+  pendiente: number;
+  transito: number;
+  entregado: number;
 }
 
 interface FinancialStats {
@@ -64,7 +63,7 @@ export default function Analytics() {
           <CardContent>
             <div className="text-2xl font-bold">{orderStats?.total || 0}</div>
             <p className="text-xs text-muted-foreground">
-              {orderStats?.pendente || 0} pendentes
+              {orderStats?.pendiente || 0} pendientes
             </p>
           </CardContent>
         </Card>
@@ -75,9 +74,9 @@ export default function Analytics() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{orderStats?.emTransito || 0}</div>
+            <div className="text-2xl font-bold">{orderStats?.transito || 0}</div>
             <p className="text-xs text-muted-foreground">
-              {orderStats?.entregue || 0} entregues
+              {orderStats?.entregado || 0} entregados
             </p>
           </CardContent>
         </Card>
@@ -135,10 +134,10 @@ export default function Analytics() {
                   <p className="text-sm font-medium">
                     R$ {parseFloat(order.totalGuia || '0').toLocaleString('pt-BR')}
                   </p>
-                  <Badge 
+                  <Badge
                     variant={
-                      order.situacao === 'quitado' ? 'default' :
-                      order.situacao === 'em-transito' ? 'secondary' : 'outline'
+                      order.situacao === 'entregado' ? 'default' :
+                      order.situacao === 'transito' ? 'secondary' : 'outline'
                     }
                     className="text-xs"
                   >
@@ -194,34 +193,26 @@ export default function Analytics() {
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="text-center p-4 bg-blue-50 dark:bg-blue-950 rounded-lg">
-              <div className="text-2xl font-bold text-blue-600">{orderStats?.pendente || 0}</div>
-              <div className="text-sm text-blue-600">Pendente</div>
+              <div className="text-2xl font-bold text-blue-600">{orderStats?.pendiente || 0}</div>
+              <div className="text-sm text-blue-600">Pendiente</div>
               <div className="text-xs text-muted-foreground">
-                {orderStats?.total ? Math.round((orderStats.pendente / orderStats.total) * 100) : 0}%
+                {orderStats?.total ? Math.round((orderStats.pendiente / orderStats.total) * 100) : 0}%
               </div>
             </div>
-            
+
             <div className="text-center p-4 bg-yellow-50 dark:bg-yellow-950 rounded-lg">
-              <div className="text-2xl font-bold text-yellow-600">{orderStats?.emTransito || 0}</div>
-              <div className="text-sm text-yellow-600">Em Trânsito</div>
+              <div className="text-2xl font-bold text-yellow-600">{orderStats?.transito || 0}</div>
+              <div className="text-sm text-yellow-600">En Tránsito</div>
               <div className="text-xs text-muted-foreground">
-                {orderStats?.total ? Math.round((orderStats.emTransito / orderStats.total) * 100) : 0}%
+                {orderStats?.total ? Math.round((orderStats.transito / orderStats.total) * 100) : 0}%
               </div>
             </div>
-            
+
             <div className="text-center p-4 bg-green-50 dark:bg-green-950 rounded-lg">
-              <div className="text-2xl font-bold text-green-600">{orderStats?.entregue || 0}</div>
-              <div className="text-sm text-green-600">Entregue</div>
+              <div className="text-2xl font-bold text-green-600">{orderStats?.entregado || 0}</div>
+              <div className="text-sm text-green-600">Entregado</div>
               <div className="text-xs text-muted-foreground">
-                {orderStats?.total ? Math.round((orderStats.entregue / orderStats.total) * 100) : 0}%
-              </div>
-            </div>
-            
-            <div className="text-center p-4 bg-purple-50 dark:bg-purple-950 rounded-lg">
-              <div className="text-2xl font-bold text-purple-600">{orderStats?.quitado || 0}</div>
-              <div className="text-sm text-purple-600">Quitado</div>
-              <div className="text-xs text-muted-foreground">
-                {orderStats?.total ? Math.round((orderStats.quitado / orderStats.total) * 100) : 0}%
+                {orderStats?.total ? Math.round((orderStats.entregado / orderStats.total) * 100) : 0}%
               </div>
             </div>
           </div>

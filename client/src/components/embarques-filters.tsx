@@ -13,19 +13,15 @@ interface EmbarquesFiltersProps {
     pedidoOuAno: string;
     exporterId: string;
     importerId: string;
-    notify: string;
     portoEmbarque: string;
-    portoDesembarque: string;
-    representante: string;
-    blCrtAwb: string;
+    portoDestino: string;
     dataPedidoInicio: string;
     dataPedidoFim: string;
     dataEmbarqueInicio: string;
     dataEmbarqueFim: string;
-    dataDesembarqueInicio: string;
-    dataDesembarqueFim: string;
+    dataChegadaInicio: string;
+    dataChegadaFim: string;
     situacaoPedido: string;
-    grupo: string;
     referenciaExportador: string;
     referenciaImportador: string;
     page: number;
@@ -37,7 +33,7 @@ interface EmbarquesFiltersProps {
 
 export default function EmbarquesFilters({ filters, onFiltersChange }: EmbarquesFiltersProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  
+
   const { data: exporters } = useQuery<any[]>({ queryKey: ["/api/exporters"] });
   const { data: importers } = useQuery<any[]>({ queryKey: ["/api/importers"] });
 
@@ -46,7 +42,7 @@ export default function EmbarquesFilters({ filters, onFiltersChange }: Embarques
     onFiltersChange({
       ...filters,
       [key]: finalValue,
-      page: 1, // Reset to first page when filtering
+      page: 1,
     });
   };
 
@@ -59,19 +55,15 @@ export default function EmbarquesFilters({ filters, onFiltersChange }: Embarques
       pedidoOuAno: "",
       exporterId: "",
       importerId: "",
-      notify: "",
       portoEmbarque: "",
-      portoDesembarque: "",
-      representante: "",
-      blCrtAwb: "",
+      portoDestino: "",
       dataPedidoInicio: "",
       dataPedidoFim: "",
       dataEmbarqueInicio: "",
       dataEmbarqueFim: "",
-      dataDesembarqueInicio: "",
-      dataDesembarqueFim: "",
+      dataChegadaInicio: "",
+      dataChegadaFim: "",
       situacaoPedido: "",
-      grupo: "",
       referenciaExportador: "",
       referenciaImportador: "",
       page: 1,
@@ -82,14 +74,14 @@ export default function EmbarquesFilters({ filters, onFiltersChange }: Embarques
 
   const getActiveFilters = () => {
     const active = [];
-    
+
     if (filters.pedidoOuAno) {
       active.push({
         key: "pedidoOuAno",
-        label: `Pedido/Ano: ${filters.pedidoOuAno}`,
+        label: `Pedido/Año: ${filters.pedidoOuAno}`,
       });
     }
-    
+
     if (filters.exporterId && exporters) {
       const exporter = exporters.find((e: any) => e.id === filters.exporterId);
       if (exporter) {
@@ -99,7 +91,7 @@ export default function EmbarquesFilters({ filters, onFiltersChange }: Embarques
         });
       }
     }
-    
+
     if (filters.importerId && importers) {
       const importer = importers.find((i: any) => i.id === filters.importerId);
       if (importer) {
@@ -110,58 +102,29 @@ export default function EmbarquesFilters({ filters, onFiltersChange }: Embarques
       }
     }
 
-    if (filters.notify) {
-      active.push({
-        key: "notify",
-        label: `Notify: ${filters.notify}`,
-      });
-    }
-
     if (filters.portoEmbarque) {
       active.push({
         key: "portoEmbarque",
-        label: `Porto Embarque: ${filters.portoEmbarque}`,
+        label: `Puerto Embarque: ${filters.portoEmbarque}`,
       });
     }
 
-    if (filters.portoDesembarque) {
+    if (filters.portoDestino) {
       active.push({
-        key: "portoDesembarque",
-        label: `Porto Desembarque: ${filters.portoDesembarque}`,
-      });
-    }
-
-    if (filters.representante) {
-      active.push({
-        key: "representante",
-        label: `Representante: ${filters.representante}`,
-      });
-    }
-
-    if (filters.blCrtAwb) {
-      active.push({
-        key: "blCrtAwb",
-        label: `BL/CRT/AWB: ${filters.blCrtAwb}`,
+        key: "portoDestino",
+        label: `Puerto Destino: ${filters.portoDestino}`,
       });
     }
 
     if (filters.situacaoPedido) {
       const statusLabels = {
-        pendente: "Pendente",
-        "em-transito": "Em Trânsito",
-        entregue: "Entregue",
-        cancelado: "Cancelado",
+        pendiente: "Pendiente",
+        transito: "En Tránsito",
+        entregado: "Entregado",
       };
       active.push({
         key: "situacaoPedido",
-        label: `Situação: ${statusLabels[filters.situacaoPedido as keyof typeof statusLabels]}`,
-      });
-    }
-
-    if (filters.grupo) {
-      active.push({
-        key: "grupo",
-        label: `Grupo: ${filters.grupo}`,
+        label: `Situación: ${statusLabels[filters.situacaoPedido as keyof typeof statusLabels]}`,
       });
     }
 
@@ -182,24 +145,24 @@ export default function EmbarquesFilters({ filters, onFiltersChange }: Embarques
     if (filters.dataPedidoInicio && filters.dataPedidoFim) {
       active.push({
         key: "dataPedido",
-        label: `Data Pedido: ${filters.dataPedidoInicio} - ${filters.dataPedidoFim}`,
+        label: `Fecha Pedido: ${filters.dataPedidoInicio} - ${filters.dataPedidoFim}`,
       });
     }
 
     if (filters.dataEmbarqueInicio && filters.dataEmbarqueFim) {
       active.push({
         key: "dataEmbarque",
-        label: `Data Embarque: ${filters.dataEmbarqueInicio} - ${filters.dataEmbarqueFim}`,
+        label: `Fecha Embarque: ${filters.dataEmbarqueInicio} - ${filters.dataEmbarqueFim}`,
       });
     }
 
-    if (filters.dataDesembarqueInicio && filters.dataDesembarqueFim) {
+    if (filters.dataChegadaInicio && filters.dataChegadaFim) {
       active.push({
-        key: "dataDesembarque",
-        label: `Data Desembarque: ${filters.dataDesembarqueInicio} - ${filters.dataDesembarqueFim}`,
+        key: "dataChegada",
+        label: `Fecha Llegada: ${filters.dataChegadaInicio} - ${filters.dataChegadaFim}`,
       });
     }
-    
+
     return active;
   };
 
@@ -220,7 +183,7 @@ export default function EmbarquesFilters({ filters, onFiltersChange }: Embarques
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
-              placeholder="Pedido ou Ano..."
+              placeholder="Pedido o Año..."
               value={filters.pedidoOuAno}
               onChange={(e) => handleFilterChange("pedidoOuAno", e.target.value)}
               className="pl-10"
@@ -233,7 +196,7 @@ export default function EmbarquesFilters({ filters, onFiltersChange }: Embarques
               <SelectValue placeholder="Exportador" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todos os exportadores</SelectItem>
+              <SelectItem value="all">Todos los exportadores</SelectItem>
               {exporters?.filter((e: any) => e.name && e.name.trim() !== "").map((exporter: any) => (
                 <SelectItem key={exporter.id} value={exporter.id}>
                   {exporter.name}
@@ -248,7 +211,7 @@ export default function EmbarquesFilters({ filters, onFiltersChange }: Embarques
               <SelectValue placeholder="Importador" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todos os importadores</SelectItem>
+              <SelectItem value="all">Todos los importadores</SelectItem>
               {importers?.filter((i: any) => i.name && i.name.trim() !== "").map((importer: any) => (
                 <SelectItem key={importer.id} value={importer.id}>
                   {importer.name}
@@ -260,30 +223,29 @@ export default function EmbarquesFilters({ filters, onFiltersChange }: Embarques
           {/* Situação Pedido */}
           <Select value={filters.situacaoPedido || "all"} onValueChange={(value) => handleFilterChange("situacaoPedido", value)}>
             <SelectTrigger>
-              <SelectValue placeholder="Situação Pedido" />
+              <SelectValue placeholder="Situación Pedido" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todas as situações</SelectItem>
-              <SelectItem value="pendente">Pendente</SelectItem>
-              <SelectItem value="em-transito">Em Trânsito</SelectItem>
-              <SelectItem value="entregue">Entregue</SelectItem>
-              <SelectItem value="cancelado">Cancelado</SelectItem>
+              <SelectItem value="all">Todas las situaciones</SelectItem>
+              <SelectItem value="pendiente">Pendiente</SelectItem>
+              <SelectItem value="transito">En Tránsito</SelectItem>
+              <SelectItem value="entregado">Entregado</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         {/* Action Buttons */}
         <div className="flex gap-2 mb-4">
-          <Button 
-            variant="default" 
+          <Button
+            variant="default"
             size="sm"
             className="flex items-center gap-2"
           >
             <Search className="h-4 w-4" />
             Buscar
           </Button>
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             size="sm"
             onClick={clearAllFilters}
             className="flex items-center gap-2"
@@ -302,60 +264,37 @@ export default function EmbarquesFilters({ filters, onFiltersChange }: Embarques
             >
               <span className="flex items-center">
                 <Filter className="mr-2 h-4 w-4" />
-                Filtros Avançados de Embarque
+                Filtros Avanzados de Embarque
               </span>
               <span className="text-xs text-gray-500">
                 {isExpanded ? "Ocultar" : "Mostrar"}
               </span>
             </Button>
           </CollapsibleTrigger>
-          
+
           <CollapsibleContent className="space-y-4 mt-4">
             {/* Shipping Info Filters */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input
-                placeholder="Notify"
-                value={filters.notify}
-                onChange={(e) => handleFilterChange("notify", e.target.value)}
-              />
-              <Input
-                placeholder="Porto de Embarque"
+                placeholder="Puerto de Embarque"
                 value={filters.portoEmbarque}
                 onChange={(e) => handleFilterChange("portoEmbarque", e.target.value)}
               />
               <Input
-                placeholder="Porto de Desembarque"
-                value={filters.portoDesembarque}
-                onChange={(e) => handleFilterChange("portoDesembarque", e.target.value)}
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Input
-                placeholder="Representante"
-                value={filters.representante}
-                onChange={(e) => handleFilterChange("representante", e.target.value)}
-              />
-              <Input
-                placeholder="BL/CRT/AWB"
-                value={filters.blCrtAwb}
-                onChange={(e) => handleFilterChange("blCrtAwb", e.target.value)}
-              />
-              <Input
-                placeholder="Grupo"
-                value={filters.grupo}
-                onChange={(e) => handleFilterChange("grupo", e.target.value)}
+                placeholder="Puerto de Destino"
+                value={filters.portoDestino}
+                onChange={(e) => handleFilterChange("portoDestino", e.target.value)}
               />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input
-                placeholder="Referência Exportador"
+                placeholder="Referencia Exportador"
                 value={filters.referenciaExportador}
                 onChange={(e) => handleFilterChange("referenciaExportador", e.target.value)}
               />
               <Input
-                placeholder="Referência Importador"
+                placeholder="Referencia Importador"
                 value={filters.referenciaImportador}
                 onChange={(e) => handleFilterChange("referenciaImportador", e.target.value)}
               />
@@ -366,7 +305,7 @@ export default function EmbarquesFilters({ filters, onFiltersChange }: Embarques
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700 flex items-center">
                   <Calendar className="mr-2 h-4 w-4" />
-                  Data do Pedido
+                  Fecha del Pedido
                 </label>
                 <div className="grid grid-cols-2 gap-2">
                   <Input
@@ -379,7 +318,7 @@ export default function EmbarquesFilters({ filters, onFiltersChange }: Embarques
                     type="date"
                     value={filters.dataPedidoFim}
                     onChange={(e) => handleFilterChange("dataPedidoFim", e.target.value)}
-                    placeholder="Até"
+                    placeholder="Hasta"
                   />
                 </div>
               </div>
@@ -387,7 +326,7 @@ export default function EmbarquesFilters({ filters, onFiltersChange }: Embarques
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700 flex items-center">
                   <Calendar className="mr-2 h-4 w-4" />
-                  Data de Embarque
+                  Fecha de Embarque
                 </label>
                 <div className="grid grid-cols-2 gap-2">
                   <Input
@@ -400,7 +339,7 @@ export default function EmbarquesFilters({ filters, onFiltersChange }: Embarques
                     type="date"
                     value={filters.dataEmbarqueFim}
                     onChange={(e) => handleFilterChange("dataEmbarqueFim", e.target.value)}
-                    placeholder="Até"
+                    placeholder="Hasta"
                   />
                 </div>
               </div>
@@ -408,20 +347,20 @@ export default function EmbarquesFilters({ filters, onFiltersChange }: Embarques
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700 flex items-center">
                   <Calendar className="mr-2 h-4 w-4" />
-                  Data de Desembarque
+                  Fecha de Llegada
                 </label>
                 <div className="grid grid-cols-2 gap-2">
                   <Input
                     type="date"
-                    value={filters.dataDesembarqueInicio}
-                    onChange={(e) => handleFilterChange("dataDesembarqueInicio", e.target.value)}
+                    value={filters.dataChegadaInicio}
+                    onChange={(e) => handleFilterChange("dataChegadaInicio", e.target.value)}
                     placeholder="De"
                   />
                   <Input
                     type="date"
-                    value={filters.dataDesembarqueFim}
-                    onChange={(e) => handleFilterChange("dataDesembarqueFim", e.target.value)}
-                    placeholder="Até"
+                    value={filters.dataChegadaFim}
+                    onChange={(e) => handleFilterChange("dataChegadaFim", e.target.value)}
+                    placeholder="Hasta"
                   />
                 </div>
               </div>
@@ -433,7 +372,7 @@ export default function EmbarquesFilters({ filters, onFiltersChange }: Embarques
         {activeFilters.length > 0 && (
           <div className="pt-4 border-t border-gray-200">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-sm text-gray-600 font-medium">Filtros ativos:</span>
+              <span className="text-sm text-gray-600 font-medium">Filtros activos:</span>
               {activeFilters.map((filter) => (
                 <Badge
                   key={filter.key}
@@ -446,9 +385,9 @@ export default function EmbarquesFilters({ filters, onFiltersChange }: Embarques
                     } else if (filter.key === "dataEmbarque") {
                       removeFilter("dataEmbarqueInicio");
                       removeFilter("dataEmbarqueFim");
-                    } else if (filter.key === "dataDesembarque") {
-                      removeFilter("dataDesembarqueInicio");
-                      removeFilter("dataDesembarqueFim");
+                    } else if (filter.key === "dataChegada") {
+                      removeFilter("dataChegadaInicio");
+                      removeFilter("dataChegadaFim");
                     } else {
                       removeFilter(filter.key);
                     }
@@ -464,7 +403,7 @@ export default function EmbarquesFilters({ filters, onFiltersChange }: Embarques
                 onClick={clearAllFilters}
                 className="text-gray-500 hover:text-gray-700"
               >
-                Limpar todos
+                Limpiar todos
               </Button>
             </div>
           </div>

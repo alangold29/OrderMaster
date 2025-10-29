@@ -5,10 +5,9 @@ import { ShoppingCart, Clock, Truck, CheckCircle } from "lucide-react";
 export default function DashboardStats() {
   const { data: stats, isLoading } = useQuery<{
     total: number;
-    pendente: number;
-    emTransito: number;
-    entregue: number;
-    quitado: number;
+    pendiente: number;
+    transito: number;
+    entregado: number;
   }>({
     queryKey: ["/api/stats"],
   });
@@ -41,20 +40,20 @@ export default function DashboardStats() {
       color: "text-primary",
     },
     {
-      title: "Pendentes",
-      value: stats?.pendente || 0,
+      title: "Pendientes",
+      value: stats?.pendiente || 0,
       icon: Clock,
       color: "text-pending",
     },
     {
-      title: "Em Trânsito",
-      value: stats?.emTransito || 0,
+      title: "En Tránsito",
+      value: stats?.transito || 0,
       icon: Truck,
       color: "text-in-transit",
     },
     {
-      title: "Entregues",
-      value: stats?.entregue || 0,
+      title: "Entregados",
+      value: stats?.entregado || 0,
       icon: CheckCircle,
       color: "text-delivered",
     },

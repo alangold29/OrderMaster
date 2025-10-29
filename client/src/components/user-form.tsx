@@ -18,7 +18,7 @@ export function UserForm({ user, onClose, onSuccess }: UserFormProps) {
     email: user?.email || "",
     name: user?.name || "",
     position: user?.position || "",
-    role: user?.role || "viewer",
+    role: user?.role || "visualizador",
     isActive: user?.isActive ?? true,
   });
 
@@ -123,14 +123,12 @@ export function UserForm({ user, onClose, onSuccess }: UserFormProps) {
 
   const getRoleLabel = (role: string) => {
     switch (role) {
-      case USER_ROLES.ADMIN:
-        return "Administrador";
-      case USER_ROLES.MANAGER:
-        return "Gerente";
-      case USER_ROLES.EDITOR:
-        return "Editor";
-      case USER_ROLES.VIEWER:
-        return "Visualizador";
+      case USER_ROLES.GERENTE:
+        return "Gerente (Acceso Total)";
+      case USER_ROLES.ADMINISTRADOR:
+        return "Administrador (Edición Limitada)";
+      case USER_ROLES.VISUALIZADOR:
+        return "Visualizador (Solo Lectura)";
       default:
         return role;
     }

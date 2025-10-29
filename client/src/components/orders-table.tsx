@@ -121,10 +121,9 @@ export default function OrdersTable({ filters, onFiltersChange }: OrdersTablePro
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      pendente: { label: "Pendente", className: "bg-pending/10 text-pending" },
-      "em-transito": { label: "Em Trânsito", className: "bg-in-transit/10 text-in-transit" },
-      entregue: { label: "Entregue", className: "bg-delivered/10 text-delivered" },
-      quitado: { label: "Quitado", className: "bg-green-100 text-green-800" },
+      pendiente: { label: "Pendiente", className: "bg-pending/10 text-pending" },
+      transito: { label: "En Tránsito", className: "bg-in-transit/10 text-in-transit" },
+      entregado: { label: "Entregado", className: "bg-delivered/10 text-delivered" },
     };
     
     const config = statusConfig[status as keyof typeof statusConfig] || {

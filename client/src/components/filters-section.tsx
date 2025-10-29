@@ -70,11 +70,9 @@ export default function FiltersSection({ filters, onFiltersChange }: FiltersProp
 
     if (filters.situacao) {
       const statusLabels = {
-        pendente: "Pendente",
-        "em-transito": "Em Trânsito",
-        entregue: "Entregue",
-        quitado: "Quitado",
-        cancelado: "Cancelado",
+        pendiente: "Pendiente",
+        transito: "En Tránsito",
+        entregado: "Entregado",
       };
       active.push({
         key: "situacao",
@@ -149,11 +147,10 @@ export default function FiltersSection({ filters, onFiltersChange }: FiltersProp
               <SelectValue placeholder="Todas as situações" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todas as situações</SelectItem>
-              <SelectItem value="pendente">Pendente</SelectItem>
-              <SelectItem value="em-transito">Em Trânsito</SelectItem>
-              <SelectItem value="entregue">Entregue</SelectItem>
-              <SelectItem value="quitado">Quitado</SelectItem>
+              <SelectItem value="all">Todas las situaciones</SelectItem>
+              <SelectItem value="pendiente">Pendiente</SelectItem>
+              <SelectItem value="transito">En Tránsito</SelectItem>
+              <SelectItem value="entregado">Entregado</SelectItem>
             </SelectContent>
           </Select>
 

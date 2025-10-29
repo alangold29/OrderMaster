@@ -19,7 +19,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         email: "gerente@cgm.com",
         name: "Gerente Demo",
         position: "Gerente",
-        role: "manager", // Can be: admin, manager, editor, viewer
+        role: "gerente", // Can be: gerente, administrador, visualizador
         isActive: true,
         permissions: {},
         lastLogin: new Date(),
@@ -45,6 +45,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         importerId,
         producerId,
         situacao,
+        portoEmbarque,
+        portoDestino,
+        referenciaExportador,
+        referenciaImportador,
+        dataPedidoInicio,
+        dataPedidoFim,
+        dataEmbarqueInicio,
+        dataEmbarqueFim,
+        dataChegadaInicio,
+        dataChegadaFim,
         sortBy,
         sortOrder,
       } = req.query;
@@ -60,6 +70,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         importerId: importerId as string,
         producerId: producerId as string,
         situacao: situacao as string,
+        portoEmbarque: portoEmbarque as string,
+        portoDestino: portoDestino as string,
+        referenciaExportador: referenciaExportador as string,
+        referenciaImportador: referenciaImportador as string,
+        dataPedidoInicio: dataPedidoInicio as string,
+        dataPedidoFim: dataPedidoFim as string,
+        dataEmbarqueInicio: dataEmbarqueInicio as string,
+        dataEmbarqueFim: dataEmbarqueFim as string,
+        dataChegadaInicio: dataChegadaInicio as string,
+        dataChegadaFim: dataChegadaFim as string,
         sortBy: sortBy as string,
         sortOrder: sortOrder as 'asc' | 'desc',
       };
@@ -287,7 +307,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             previsao: toString(row["PREVISÃO"] || row.previsao),
             chegada: toString(row.CHEGADA || row.chegada),
             observacao: toString(row["OBSERVAÇÃO"] || row.observacao),
-            situacao: toString(row["SITUAÇÃO"] || row.situacao) || "pendente",
+            situacao: toString(row["SITUAÇÃO"] || row.situacao) || "pendiente",
             semana: toString(row.SEMANA || row.semana),
           };
 

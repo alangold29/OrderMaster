@@ -49,7 +49,7 @@ export const orders = pgTable("orders", {
   previsao: date("previsao"),
   chegada: date("chegada"),
   observacao: text("observacao"),
-  situacao: text("situacao").notNull().default("pendente"),
+  situacao: text("situacao").notNull().default("pendiente"),
   semana: text("semana"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -153,7 +153,7 @@ export const companyUsers = pgTable("company_users", {
   email: varchar("email").notNull().unique(),
   name: varchar("name").notNull(),
   position: varchar("position").notNull(), // cargo/posição
-  role: varchar("role").notNull().default("viewer"), // admin, manager, editor, viewer
+  role: varchar("role").notNull().default("visualizador"), // gerente, administrador, visualizador
   isActive: boolean("is_active").default(true),
   permissions: jsonb("permissions").default({}), // specific permissions object
   lastLogin: timestamp("last_login"),
@@ -174,12 +174,11 @@ export const insertCompanyUserSchema = createInsertSchema(companyUsers).omit({
 export type CompanyUser = typeof companyUsers.$inferSelect;
 export type InsertCompanyUser = z.infer<typeof insertCompanyUserSchema>;
 
-// User Roles enum for reference
+// User Roles enum for reference (3 levels only)
 export const USER_ROLES = {
-  ADMIN: 'admin',
-  MANAGER: 'manager', 
-  EDITOR: 'editor',
-  VIEWER: 'viewer'
+  GERENTE: 'gerente',      // Full access - can do everything
+  ADMINISTRADOR: 'administrador',  // Limited editing - can edit but not delete
+  VISUALIZADOR: 'visualizador'     // Read only - can only view
 } as const;
 
 // Permission structure for different areas

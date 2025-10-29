@@ -104,6 +104,34 @@ class Storage implements IStorage {
       query = query.eq('situacao', params.situacao);
     }
 
+    if (params.portoEmbarque && params.portoEmbarque.trim()) {
+      query = query.ilike('porto_embarque', `%${params.portoEmbarque}%`);
+    }
+
+    if (params.portoDestino && params.portoDestino.trim()) {
+      query = query.ilike('porto_destino', `%${params.portoDestino}%`);
+    }
+
+    if (params.referenciaExportador && params.referenciaExportador.trim()) {
+      query = query.ilike('referencia_exportador', `%${params.referenciaExportador}%`);
+    }
+
+    if (params.referenciaImportador && params.referenciaImportador.trim()) {
+      query = query.ilike('referencia_importador', `%${params.referenciaImportador}%`);
+    }
+
+    if (params.dataPedidoInicio && params.dataPedidoFim) {
+      query = query.gte('data', params.dataPedidoInicio).lte('data', params.dataPedidoFim);
+    }
+
+    if (params.dataEmbarqueInicio && params.dataEmbarqueFim) {
+      query = query.gte('embarque', params.dataEmbarqueInicio).lte('embarque', params.dataEmbarqueFim);
+    }
+
+    if (params.dataChegadaInicio && params.dataChegadaFim) {
+      query = query.gte('chegada', params.dataChegadaInicio).lte('chegada', params.dataChegadaFim);
+    }
+
     const { data: orders, error, count } = await query
       .order(params.sortBy || 'data', { ascending: params.sortOrder === 'asc' })
       .range(from, to);
@@ -258,32 +286,26 @@ class Storage implements IStorage {
       .from('orders')
       .select('*', { count: 'exact', head: true });
 
-    const { count: pendente } = await supabase
+    const { count: pendiente } = await supabase
       .from('orders')
       .select('*', { count: 'exact', head: true })
-      .eq('situacao', 'pendente');
+      .eq('situacao', 'pendiente');
 
-    const { count: emTransito } = await supabase
+    const { count: transito } = await supabase
       .from('orders')
       .select('*', { count: 'exact', head: true })
-      .eq('situacao', 'em-transito');
+      .eq('situacao', 'transito');
 
-    const { count: entregue } = await supabase
+    const { count: entregado } = await supabase
       .from('orders')
       .select('*', { count: 'exact', head: true })
-      .eq('situacao', 'entregue');
-
-    const { count: quitado } = await supabase
-      .from('orders')
-      .select('*', { count: 'exact', head: true })
-      .eq('situacao', 'quitado');
+      .eq('situacao', 'entregado');
 
     return {
       total: total || 0,
-      pendente: pendente || 0,
-      emTransito: emTransito || 0,
-      entregue: entregue || 0,
-      quitado: quitado || 0,
+      pendiente: pendiente || 0,
+      transito: transito || 0,
+      entregado: entregado || 0,
     };
   }
 
@@ -298,9 +320,9 @@ class Storage implements IStorage {
       const amount = parseFloat(order.total_guia || '0');
       acc.totalReceivable += amount;
 
-      if (order.situacao === 'entregue' || order.situacao === 'quitado') {
+      if (order.situacao === 'entregado') {
         acc.totalPaid += amount;
-      } else if (order.situacao === 'pendente') {
+      } else if (order.situacao === 'pendiente') {
         acc.pendingPayment += amount;
       }
 
