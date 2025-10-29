@@ -351,31 +351,51 @@ class Storage implements IStorage {
   }
 
   async getOrderStats() {
-    const { count: total } = await supabase
+    const { count: total, error: totalError } = await supabase
       .from('orders')
       .select('*', { count: 'exact', head: true });
 
-    const { count: pendiente } = await supabase
+    if (totalError) {
+      console.error('Error getting total stats:', totalError);
+    }
+
+    const { count: pendiente, error: pendienteError } = await supabase
       .from('orders')
       .select('*', { count: 'exact', head: true })
       .eq('situacao', 'pendiente');
 
-    const { count: transito } = await supabase
+    if (pendienteError) {
+      console.error('Error getting pendiente stats:', pendienteError);
+    }
+
+    const { count: transito, error: transitoError } = await supabase
       .from('orders')
       .select('*', { count: 'exact', head: true })
       .eq('situacao', 'transito');
 
-    const { count: entregado } = await supabase
+    if (transitoError) {
+      console.error('Error getting transito stats:', transitoError);
+    }
+
+    const { count: entregado, error: entregadoError } = await supabase
       .from('orders')
       .select('*', { count: 'exact', head: true })
       .eq('situacao', 'entregado');
 
-    return {
+    if (entregadoError) {
+      console.error('Error getting entregado stats:', entregadoError);
+    }
+
+    const stats = {
       total: total || 0,
       pendiente: pendiente || 0,
       transito: transito || 0,
       entregado: entregado || 0,
     };
+
+    console.log('📊 Order Stats:', stats);
+
+    return stats;
   }
 
   async getFinancialStats() {
