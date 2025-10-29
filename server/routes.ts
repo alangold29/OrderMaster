@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertOrderSchema } from "@shared/schema";
+import { insertOrderSchema, updateOrderSchema } from "@shared/schema";
 import multer from "multer";
 import * as XLSX from "xlsx";
 
@@ -142,7 +142,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/orders/:id", async (req, res) => {
     try {
-      const validatedData = insertOrderSchema.parse(req.body);
+      const validatedData = updateOrderSchema.parse(req.body);
       const order = await storage.updateOrder(req.params.id, validatedData);
       res.json(order);
     } catch (error) {

@@ -128,6 +128,8 @@ export const insertOrderSchema = createInsertSchema(orders).omit({
   dataEmissaoPedido: optionalStringTransform,
 });
 
+export const updateOrderSchema = insertOrderSchema.partial();
+
 
 export type Client = typeof clients.$inferSelect;
 export type Exporter = typeof exporters.$inferSelect;
