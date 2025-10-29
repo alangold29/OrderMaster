@@ -225,11 +225,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Statistics
   app.get("/api/stats", async (req, res) => {
     try {
+      console.log("📊 GET /api/stats - Fetching order statistics...");
       const stats = await storage.getOrderStats();
+      console.log("✅ Stats retrieved:", stats);
       res.json(stats);
     } catch (error) {
-      console.error("Error fetching stats:", error);
-      res.status(500).json({ error: "Failed to fetch statistics" });
+      console.error("❌ Error fetching stats:", error);
+      res.status(500).json({
+        error: "Failed to fetch statistics",
+        details: error instanceof Error ? error.message : String(error)
+      });
     }
   });
 
