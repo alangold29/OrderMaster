@@ -58,7 +58,7 @@ export default function OrderFormModal({ isOpen, onClose }: OrderFormModalProps)
       quantidade: "",
       referenciaExportador: "",
       referenciaImportador: "",
-      situacao: "pendente",
+      situacao: "pendiente",
     },
   });
 
@@ -465,11 +465,9 @@ export default function OrderFormModal({ isOpen, onClose }: OrderFormModalProps)
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="pendente">Pendente</SelectItem>
-                      <SelectItem value="em-transito">Em Trânsito</SelectItem>
-                      <SelectItem value="entregue">Entregue</SelectItem>
-                      <SelectItem value="quitado">Quitado</SelectItem>
-                      <SelectItem value="cancelado">Cancelado</SelectItem>
+                      <SelectItem value="pendiente">Pendiente</SelectItem>
+                      <SelectItem value="transito">En Tránsito</SelectItem>
+                      <SelectItem value="entregado">Entregado</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

@@ -29,10 +29,9 @@ interface CompleteDataTableProps {
 }
 
 const statusColors = {
-  pendente: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
-  "em-transito": "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
-  entregue: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-  quitado: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200",
+  pendiente: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+  transito: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+  entregado: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
 };
 
 export default function CompleteDataTable({ 

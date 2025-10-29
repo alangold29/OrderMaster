@@ -16,6 +16,12 @@ interface FiltersProps {
     importerId: string;
     producerId: string;
     situacao: string;
+    dataPedidoInicio?: string;
+    dataPedidoFim?: string;
+    dataEmbarqueInicio?: string;
+    dataEmbarqueFim?: string;
+    dataChegadaInicio?: string;
+    dataChegadaFim?: string;
     page: number;
     sortBy: string;
     sortOrder: "asc" | "desc";
@@ -25,7 +31,7 @@ interface FiltersProps {
 
 export default function FiltersSection({ filters, onFiltersChange }: FiltersProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  
+
   const { data: clients } = useQuery<any[]>({ queryKey: ["/api/clients"] });
   const { data: exporters } = useQuery<any[]>({ queryKey: ["/api/exporters"] });
   const { data: importers } = useQuery<any[]>({ queryKey: ["/api/importers"] });
@@ -36,12 +42,35 @@ export default function FiltersSection({ filters, onFiltersChange }: FiltersProp
     onFiltersChange({
       ...filters,
       [key]: finalValue,
-      page: 1, // Reset to first page when filtering
+      page: 1,
     });
   };
 
   const removeFilter = (key: string) => {
-    handleFilterChange(key, "all");
+    if (key === "dataPedido") {
+      onFiltersChange({
+        ...filters,
+        dataPedidoInicio: "",
+        dataPedidoFim: "",
+        page: 1,
+      });
+    } else if (key === "dataEmbarque") {
+      onFiltersChange({
+        ...filters,
+        dataEmbarqueInicio: "",
+        dataEmbarqueFim: "",
+        page: 1,
+      });
+    } else if (key === "dataChegada") {
+      onFiltersChange({
+        ...filters,
+        dataChegadaInicio: "",
+        dataChegadaFim: "",
+        page: 1,
+      });
+    } else {
+      handleFilterChange(key, "all");
+    }
   };
 
   const clearAllFilters = () => {
@@ -52,6 +81,12 @@ export default function FiltersSection({ filters, onFiltersChange }: FiltersProp
       importerId: "",
       producerId: "",
       situacao: "",
+      dataPedidoInicio: "",
+      dataPedidoFim: "",
+      dataEmbarqueInicio: "",
+      dataEmbarqueFim: "",
+      dataChegadaInicio: "",
+      dataChegadaFim: "",
       page: 1,
       sortBy: "data",
       sortOrder: "desc",
@@ -118,6 +153,27 @@ export default function FiltersSection({ filters, onFiltersChange }: FiltersProp
           label: `Produtor: ${producer.name}`,
         });
       }
+    }
+
+    if (filters.dataPedidoInicio && filters.dataPedidoFim) {
+      active.push({
+        key: "dataPedido",
+        label: `Fecha Pedido: ${filters.dataPedidoInicio} - ${filters.dataPedidoFim}`,
+      });
+    }
+
+    if (filters.dataEmbarqueInicio && filters.dataEmbarqueFim) {
+      active.push({
+        key: "dataEmbarque",
+        label: `Fecha Embarque: ${filters.dataEmbarqueInicio} - ${filters.dataEmbarqueFim}`,
+      });
+    }
+
+    if (filters.dataChegadaInicio && filters.dataChegadaFim) {
+      active.push({
+        key: "dataChegada",
+        label: `Fecha Llegada: ${filters.dataChegadaInicio} - ${filters.dataChegadaFim}`,
+      });
     }
 
     return active;
@@ -200,6 +256,113 @@ export default function FiltersSection({ filters, onFiltersChange }: FiltersProp
           </Select>
         </div>
 
+        {/* Advanced Filters Toggle */}
+        <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
+          <CollapsibleTrigger asChild>
+            <Button
+              variant="outline"
+              className="w-full justify-between mb-4"
+              size="sm"
+            >
+              <span className="flex items-center">
+                <Filter className="mr-2 h-4 w-4" />
+                Filtros Avanzados
+              </span>
+              <span className="text-xs text-gray-500">
+                {isExpanded ? "Ocultar" : "Mostrar"}
+              </span>
+            </Button>
+          </CollapsibleTrigger>
+
+          <CollapsibleContent className="space-y-4">
+            {/* Date Range Filters */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700 flex items-center">
+                  <Calendar className="mr-2 h-4 w-4" />
+                  Fecha del Pedido
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <Input
+                    type="date"
+                    value={filters.dataPedidoInicio || ""}
+                    onChange={(e) => handleFilterChange("dataPedidoInicio", e.target.value)}
+                    placeholder="De"
+                  />
+                  <Input
+                    type="date"
+                    value={filters.dataPedidoFim || ""}
+                    onChange={(e) => handleFilterChange("dataPedidoFim", e.target.value)}
+                    placeholder="Hasta"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700 flex items-center">
+                  <Calendar className="mr-2 h-4 w-4" />
+                  Fecha de Embarque
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <Input
+                    type="date"
+                    value={filters.dataEmbarqueInicio || ""}
+                    onChange={(e) => handleFilterChange("dataEmbarqueInicio", e.target.value)}
+                    placeholder="De"
+                  />
+                  <Input
+                    type="date"
+                    value={filters.dataEmbarqueFim || ""}
+                    onChange={(e) => handleFilterChange("dataEmbarqueFim", e.target.value)}
+                    placeholder="Hasta"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700 flex items-center">
+                  <Calendar className="mr-2 h-4 w-4" />
+                  Fecha de Llegada
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <Input
+                    type="date"
+                    value={filters.dataChegadaInicio || ""}
+                    onChange={(e) => handleFilterChange("dataChegadaInicio", e.target.value)}
+                    placeholder="De"
+                  />
+                  <Input
+                    type="date"
+                    value={filters.dataChegadaFim || ""}
+                    onChange={(e) => handleFilterChange("dataChegadaFim", e.target.value)}
+                    placeholder="Hasta"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Producer Filter */}
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-2 block">
+                Productor
+              </label>
+              <Select value={filters.producerId || "all"} onValueChange={(value) => handleFilterChange("producerId", value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Todos os produtores" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos os produtores</SelectItem>
+                  {producers?.filter((p: any) => p.name && p.name.trim() !== "").map((producer: any) => (
+                    <SelectItem key={producer.id} value={producer.id}>
+                      {producer.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
+
         {/* Action Buttons */}
         {activeFilters.length > 0 && (
           <div className="flex gap-2 mb-4">
@@ -219,7 +382,7 @@ export default function FiltersSection({ filters, onFiltersChange }: FiltersProp
         {activeFilters.length > 0 && (
           <div className="mt-4 pt-4 border-t border-gray-200">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-sm text-gray-600 font-medium">Filtros ativos:</span>
+              <span className="text-sm text-gray-600 font-medium">Filtros activos:</span>
               {activeFilters.map((filter) => (
                 <Badge
                   key={filter.key}
@@ -237,7 +400,7 @@ export default function FiltersSection({ filters, onFiltersChange }: FiltersProp
                 onClick={clearAllFilters}
                 className="text-gray-500 hover:text-gray-700"
               >
-                Limpar todos
+                Limpiar todos
               </Button>
             </div>
           </div>
