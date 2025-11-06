@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -440,27 +440,29 @@ export default function OrderFormModal({ isOpen, onClose, order }: OrderFormModa
                                 placeholder="Buscar o crear exportador..."
                                 onValueChange={(value) => field.onChange(value)}
                               />
-                              <CommandEmpty>Ningún exportador encontrado.</CommandEmpty>
-                              <CommandGroup>
-                                {exportersList.map((exporter: any) => (
-                                  <CommandItem
-                                    key={exporter.id}
-                                    value={exporter.name}
-                                    onSelect={() => {
-                                      field.onChange(exporter.name);
-                                      setOpenExporter(false);
-                                    }}
-                                  >
-                                    <CheckCircle2
-                                      className={cn(
-                                        "mr-2 h-4 w-4",
-                                        field.value === exporter.name ? "opacity-100" : "opacity-0"
-                                      )}
-                                    />
-                                    {exporter.name}
-                                  </CommandItem>
-                                ))}
-                              </CommandGroup>
+                              <CommandList>
+                                <CommandEmpty>Ningún exportador encontrado.</CommandEmpty>
+                                <CommandGroup>
+                                  {exportersList.map((exporter: any) => (
+                                    <CommandItem
+                                      key={exporter.id}
+                                      value={exporter.name}
+                                      onSelect={() => {
+                                        field.onChange(exporter.name);
+                                        setOpenExporter(false);
+                                      }}
+                                    >
+                                      <CheckCircle2
+                                        className={cn(
+                                          "mr-2 h-4 w-4",
+                                          field.value === exporter.name ? "opacity-100" : "opacity-0"
+                                        )}
+                                      />
+                                      {exporter.name}
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </CommandList>
                             </Command>
                           </PopoverContent>
                         </Popover>
@@ -512,27 +514,29 @@ export default function OrderFormModal({ isOpen, onClose, order }: OrderFormModa
                                 placeholder="Buscar o crear importador..."
                                 onValueChange={(value) => field.onChange(value)}
                               />
-                              <CommandEmpty>Ningún importador encontrado.</CommandEmpty>
-                              <CommandGroup>
-                                {importersList.map((importer: any) => (
-                                  <CommandItem
-                                    key={importer.id}
-                                    value={importer.name}
-                                    onSelect={() => {
-                                      field.onChange(importer.name);
-                                      setOpenImporter(false);
-                                    }}
-                                  >
-                                    <CheckCircle2
-                                      className={cn(
-                                        "mr-2 h-4 w-4",
-                                        field.value === importer.name ? "opacity-100" : "opacity-0"
-                                      )}
-                                    />
-                                    {importer.name}
-                                  </CommandItem>
-                                ))}
-                              </CommandGroup>
+                              <CommandList>
+                                <CommandEmpty>Ningún importador encontrado.</CommandEmpty>
+                                <CommandGroup>
+                                  {importersList.map((importer: any) => (
+                                    <CommandItem
+                                      key={importer.id}
+                                      value={importer.name}
+                                      onSelect={() => {
+                                        field.onChange(importer.name);
+                                        setOpenImporter(false);
+                                      }}
+                                    >
+                                      <CheckCircle2
+                                        className={cn(
+                                          "mr-2 h-4 w-4",
+                                          field.value === importer.name ? "opacity-100" : "opacity-0"
+                                        )}
+                                      />
+                                      {importer.name}
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </CommandList>
                             </Command>
                           </PopoverContent>
                         </Popover>
@@ -584,27 +588,29 @@ export default function OrderFormModal({ isOpen, onClose, order }: OrderFormModa
                                 placeholder="Buscar o crear cliente..."
                                 onValueChange={(value) => field.onChange(value)}
                               />
-                              <CommandEmpty>Ningún cliente encontrado.</CommandEmpty>
-                              <CommandGroup>
-                                {clientsList.map((client: any) => (
-                                  <CommandItem
-                                    key={client.id}
-                                    value={client.name}
-                                    onSelect={() => {
-                                      field.onChange(client.name);
-                                      setOpenClient(false);
-                                    }}
-                                  >
-                                    <CheckCircle2
-                                      className={cn(
-                                        "mr-2 h-4 w-4",
-                                        field.value === client.name ? "opacity-100" : "opacity-0"
-                                      )}
-                                    />
-                                    {client.name}
-                                  </CommandItem>
-                                ))}
-                              </CommandGroup>
+                              <CommandList>
+                                <CommandEmpty>Ningún cliente encontrado.</CommandEmpty>
+                                <CommandGroup>
+                                  {clientsList.map((client: any) => (
+                                    <CommandItem
+                                      key={client.id}
+                                      value={client.name}
+                                      onSelect={() => {
+                                        field.onChange(client.name);
+                                        setOpenClient(false);
+                                      }}
+                                    >
+                                      <CheckCircle2
+                                        className={cn(
+                                          "mr-2 h-4 w-4",
+                                          field.value === client.name ? "opacity-100" : "opacity-0"
+                                        )}
+                                      />
+                                      {client.name}
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </CommandList>
                             </Command>
                           </PopoverContent>
                         </Popover>
@@ -640,27 +646,29 @@ export default function OrderFormModal({ isOpen, onClose, order }: OrderFormModa
                                 placeholder="Buscar o crear productor..."
                                 onValueChange={(value) => field.onChange(value || "")}
                               />
-                              <CommandEmpty>Ningún productor encontrado.</CommandEmpty>
-                              <CommandGroup>
-                                {producersList.map((producer: any) => (
-                                  <CommandItem
-                                    key={producer.id}
-                                    value={producer.name}
-                                    onSelect={() => {
-                                      field.onChange(producer.name);
-                                      setOpenProducer(false);
-                                    }}
-                                  >
-                                    <CheckCircle2
-                                      className={cn(
-                                        "mr-2 h-4 w-4",
-                                        field.value === producer.name ? "opacity-100" : "opacity-0"
-                                      )}
-                                    />
-                                    {producer.name}
-                                  </CommandItem>
-                                ))}
-                              </CommandGroup>
+                              <CommandList>
+                                <CommandEmpty>Ningún productor encontrado.</CommandEmpty>
+                                <CommandGroup>
+                                  {producersList.map((producer: any) => (
+                                    <CommandItem
+                                      key={producer.id}
+                                      value={producer.name}
+                                      onSelect={() => {
+                                        field.onChange(producer.name);
+                                        setOpenProducer(false);
+                                      }}
+                                    >
+                                      <CheckCircle2
+                                        className={cn(
+                                          "mr-2 h-4 w-4",
+                                          field.value === producer.name ? "opacity-100" : "opacity-0"
+                                        )}
+                                      />
+                                      {producer.name}
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </CommandList>
                             </Command>
                           </PopoverContent>
                         </Popover>
