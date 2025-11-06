@@ -113,7 +113,33 @@ export default function OrderFormModal({ isOpen, onClose, order }: OrderFormModa
         semana: order.semana || "",
       });
     } else if (!isOpen) {
-      form.reset();
+      form.reset({
+        pedido: "",
+        data: "",
+        exporterName: "",
+        importerName: "",
+        clientName: "",
+        producerName: "",
+        quantidade: "",
+        itens: "",
+        precoGuia: "",
+        totalGuia: "",
+        moeda: "BRL",
+        referenciaExportador: "",
+        referenciaImportador: "",
+        etiqueta: "",
+        portoEmbarque: "",
+        portoDestino: "",
+        viaTransporte: "",
+        incoterm: "",
+        condicao: "",
+        embarque: "",
+        previsao: "",
+        chegada: "",
+        observacao: "",
+        situacao: "pendiente",
+        semana: "",
+      });
     }
   }, [order, isOpen, form]);
 
@@ -281,7 +307,7 @@ export default function OrderFormModal({ isOpen, onClose, order }: OrderFormModa
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Situación *</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <Select onValueChange={field.onChange} value={field.value || ""}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Selecione..." />
@@ -306,7 +332,7 @@ export default function OrderFormModal({ isOpen, onClose, order }: OrderFormModa
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Moneda *</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <Select onValueChange={field.onChange} value={field.value || ""}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Seleccione moneda..." />
@@ -728,7 +754,7 @@ export default function OrderFormModal({ isOpen, onClose, order }: OrderFormModa
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Vía de Transporte</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <Select onValueChange={field.onChange} value={field.value || ""}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Seleccione vía..." />
@@ -752,7 +778,7 @@ export default function OrderFormModal({ isOpen, onClose, order }: OrderFormModa
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Incoterm</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <Select onValueChange={field.onChange} value={field.value || ""}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Seleccione incoterm..." />
