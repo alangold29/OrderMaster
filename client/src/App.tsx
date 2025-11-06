@@ -4,10 +4,9 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
-import { BarChart3, Package, Ship, CreditCard, Database, Users, Building2, Upload } from "lucide-react";
+import { BarChart3, Package, CreditCard, Database, Users, Building2, Upload } from "lucide-react";
 import Dashboard from "@/pages/analytics";
 import Pedidos from "@/pages/dashboard";
-import Embarques from "@/pages/embarques";
 import CompleteData from "@/pages/complete-data";
 import Contas from "@/pages/contas";
 import Usuarios from "@/pages/usuarios";
@@ -56,17 +55,6 @@ function Router() {
               >
                 <Package className="h-4 w-4" />
                 Pedidos
-              </Button>
-            </Link>
-            <Link href="/embarques">
-              <Button 
-                variant={location === "/embarques" ? "default" : "ghost"}
-                size="default"
-                className="w-full justify-start gap-3 px-4"
-                data-testid="link-embarques"
-              >
-                <Ship className="h-4 w-4" />
-                Embarques
               </Button>
             </Link>
             <Link href="/dados">
@@ -125,7 +113,6 @@ function Router() {
           <Switch>
             <Route path="/" component={Dashboard} />
             <Route path="/pedidos" component={Pedidos} />
-            <Route path="/embarques" component={Embarques} />
             <Route path="/dados" component={CompleteData} />
             <Route path="/importar" component={ImportarManual} />
             <Route path="/contas" component={Contas} />
