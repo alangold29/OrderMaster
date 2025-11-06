@@ -64,11 +64,14 @@ export default function OrderFormModal({ isOpen, onClose, order }: OrderFormModa
       itens: "",
       precoGuia: "",
       totalGuia: "",
+      moeda: "BRL",
       referenciaExportador: "",
       referenciaImportador: "",
       etiqueta: "",
       portoEmbarque: "",
       portoDestino: "",
+      viaTransporte: "",
+      incoterm: "",
       condicao: "",
       embarque: "",
       previsao: "",
@@ -93,11 +96,14 @@ export default function OrderFormModal({ isOpen, onClose, order }: OrderFormModa
         itens: order.itens || "",
         precoGuia: order.precoGuia?.toString() || "",
         totalGuia: order.totalGuia?.toString() || "",
+        moeda: order.moeda || "BRL",
         referenciaExportador: order.referenciaExportador || "",
         referenciaImportador: order.referenciaImportador || "",
         etiqueta: order.etiqueta || "",
         portoEmbarque: order.portoEmbarque || "",
         portoDestino: order.portoDestino || "",
+        viaTransporte: order.viaTransporte || "",
+        incoterm: order.incoterm || "",
         condicao: order.condicao || "",
         embarque: order.embarque || "",
         previsao: order.previsao || "",
@@ -293,7 +299,30 @@ export default function OrderFormModal({ isOpen, onClose, order }: OrderFormModa
                   />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="moeda"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Moneda *</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Seleccione moneda..." />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="BRL">BRL - Real Brasileño</SelectItem>
+                            <SelectItem value="USD">USD - Dólar Estadounidense</SelectItem>
+                            <SelectItem value="EUR">EUR - Euro</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
                   <FormField
                     control={form.control}
                     name="quantidade"
@@ -308,6 +337,9 @@ export default function OrderFormModal({ isOpen, onClose, order }: OrderFormModa
                     )}
                   />
 
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
                     name="precoGuia"
@@ -692,12 +724,63 @@ export default function OrderFormModal({ isOpen, onClose, order }: OrderFormModa
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
+                    name="viaTransporte"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Vía de Transporte</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Seleccione vía..." />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="">Sin especificar</SelectItem>
+                            <SelectItem value="terrestre">Terrestre</SelectItem>
+                            <SelectItem value="maritimo">Marítimo</SelectItem>
+                            <SelectItem value="aereo">Aéreo</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="incoterm"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Incoterm</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Seleccione incoterm..." />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="">Sin especificar</SelectItem>
+                            <SelectItem value="CIF">CIF - Cost, Insurance and Freight</SelectItem>
+                            <SelectItem value="FOB">FOB - Free On Board</SelectItem>
+                            <SelectItem value="FCA">FCA - Free Carrier</SelectItem>
+                            <SelectItem value="CFR">CFR - Cost and Freight</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
                     name="condicao"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Condición de Pago</FormLabel>
                         <FormControl>
-                          <Input placeholder="Ej: FOB, CIF..." {...field} />
+                          <Input placeholder="Ej: 30 días, contado..." {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

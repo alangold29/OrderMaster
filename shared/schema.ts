@@ -39,11 +39,14 @@ export const orders = pgTable("orders", {
   itens: text("itens"),
   precoGuia: decimal("preco_guia", { precision: 10, scale: 2 }),
   totalGuia: decimal("total_guia", { precision: 10, scale: 2 }),
+  moeda: text("moeda").notNull().default("BRL"),
   producerId: varchar("producer_id").references(() => producers.id),
   clientId: varchar("client_id").references(() => clients.id).notNull(),
   etiqueta: text("etiqueta"),
   portoEmbarque: text("porto_embarque"),
   portoDestino: text("porto_destino"),
+  viaTransporte: text("via_transporte"),
+  incoterm: text("incoterm"),
   condicao: text("condicao"),
   embarque: date("embarque"),
   previsao: date("previsao"),
@@ -126,6 +129,12 @@ export const insertOrderSchema = createInsertSchema(orders).omit({
   previsao: optionalStringTransform,
   chegada: optionalStringTransform,
   dataEmissaoPedido: optionalStringTransform,
+  // Currency with validation
+  moeda: z.enum(["BRL", "USD", "EUR"]).default("BRL"),
+  // Transport mode with validation (optional)
+  viaTransporte: z.enum(["terrestre", "maritimo", "aereo", ""]).optional(),
+  // Incoterm with validation (optional)
+  incoterm: z.enum(["CIF", "FOB", "FCA", "CFR", ""]).optional(),
 });
 
 export const updateOrderSchema = insertOrderSchema.partial();
