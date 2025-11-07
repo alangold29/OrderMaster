@@ -131,10 +131,16 @@ export const insertOrderSchema = createInsertSchema(orders).omit({
   dataEmissaoPedido: optionalStringTransform,
   // Currency with validation
   moeda: z.enum(["BRL", "USD", "EUR"]).default("BRL"),
-  // Transport mode with validation (optional)
-  viaTransporte: z.enum(["terrestre", "maritimo", "aereo", ""]).optional(),
-  // Incoterm with validation (optional)
-  incoterm: z.enum(["CIF", "FOB", "FCA", "CFR", ""]).optional(),
+  // Transport mode with validation (optional - accepts empty string or specific values)
+  viaTransporte: z.preprocess(
+    (val) => val === undefined || val === null ? "" : val,
+    z.enum(["terrestre", "maritimo", "aereo", ""])
+  ).optional(),
+  // Incoterm with validation (optional - accepts empty string or specific values)
+  incoterm: z.preprocess(
+    (val) => val === undefined || val === null ? "" : val,
+    z.enum(["CIF", "FOB", "FCA", "CFR", ""])
+  ).optional(),
 });
 
 export const updateOrderSchema = insertOrderSchema.partial();

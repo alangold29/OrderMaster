@@ -206,8 +206,8 @@ class Storage implements IStorage {
         etiqueta: orderData.etiqueta,
         porto_embarque: orderData.portoEmbarque,
         porto_destino: orderData.portoDestino,
-        via_transporte: orderData.viaTransporte,
-        incoterm: orderData.incoterm,
+        via_transporte: orderData.viaTransporte || null,
+        incoterm: orderData.incoterm || null,
         condicao: orderData.condicao,
         embarque: orderData.embarque,
         previsao: orderData.previsao,
@@ -278,8 +278,8 @@ class Storage implements IStorage {
     if (orderData.etiqueta !== undefined) updatePayload.etiqueta = orderData.etiqueta;
     if (orderData.portoEmbarque !== undefined) updatePayload.porto_embarque = orderData.portoEmbarque;
     if (orderData.portoDestino !== undefined) updatePayload.porto_destino = orderData.portoDestino;
-    if (orderData.viaTransporte !== undefined) updatePayload.via_transporte = orderData.viaTransporte;
-    if (orderData.incoterm !== undefined) updatePayload.incoterm = orderData.incoterm;
+    if (orderData.viaTransporte !== undefined) updatePayload.via_transporte = orderData.viaTransporte || null;
+    if (orderData.incoterm !== undefined) updatePayload.incoterm = orderData.incoterm || null;
     if (orderData.condicao !== undefined) updatePayload.condicao = orderData.condicao;
     if (orderData.embarque !== undefined) updatePayload.embarque = orderData.embarque;
     if (orderData.previsao !== undefined) updatePayload.previsao = orderData.previsao;
