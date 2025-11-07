@@ -153,11 +153,17 @@ export default function OrdersTable({ filters, onFiltersChange }: OrdersTablePro
     );
   };
 
-  const formatCurrency = (value: string | number) => {
+  const formatCurrency = (value: string | number, currency: string = "BRL") => {
     const num = typeof value === "string" ? parseFloat(value) : value;
-    return new Intl.NumberFormat("pt-BR", {
+    const currencyMap: Record<string, string> = {
+      BRL: "pt-BR",
+      USD: "en-US",
+      EUR: "de-DE",
+    };
+    const locale = currencyMap[currency] || "pt-BR";
+    return new Intl.NumberFormat(locale, {
       style: "currency",
-      currency: "BRL",
+      currency: currency || "BRL",
     }).format(num || 0);
   };
 
@@ -231,12 +237,13 @@ export default function OrdersTable({ filters, onFiltersChange }: OrdersTablePro
               <TableHead>Cliente</TableHead>
               <TableHead>Exportador</TableHead>
               <TableHead>Importador</TableHead>
-              <TableHead>Produtor</TableHead>
               <TableHead>Itens</TableHead>
               <TableHead>Quantidade</TableHead>
+              <TableHead>Moneda</TableHead>
+              <TableHead>Transporte</TableHead>
+              <TableHead>Incoterm</TableHead>
               <TableHead>Situação</TableHead>
               <TableHead>Embarque</TableHead>
-              <TableHead>Previsão</TableHead>
               <TableHead>Ações</TableHead>
             </TableRow>
           </TableHeader>
@@ -254,19 +261,32 @@ export default function OrdersTable({ filters, onFiltersChange }: OrdersTablePro
                 <TableCell className="text-text-secondary">
                   {order.importer?.name || "-"}
                 </TableCell>
-                <TableCell className="text-text-secondary">
-                  {order.producer?.name || "-"}
-                </TableCell>
                 <TableCell>{order.itens || "-"}</TableCell>
                 <TableCell className="text-text-secondary">
                   {order.quantidade || "-"}
                 </TableCell>
+                <TableCell>
+                  <Badge variant="outline" className="font-mono">
+                    {order.moeda || "BRL"}
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-text-secondary">
+                  {order.viaTransporte ? (
+                    <Badge variant="secondary" className="capitalize">
+                      {order.viaTransporte}
+                    </Badge>
+                  ) : "-"}
+                </TableCell>
+                <TableCell className="text-text-secondary">
+                  {order.incoterm ? (
+                    <Badge variant="outline">
+                      {order.incoterm}
+                    </Badge>
+                  ) : "-"}
+                </TableCell>
                 <TableCell>{getStatusBadge(order.situacao)}</TableCell>
                 <TableCell className="text-text-secondary">
                   {formatDate(order.embarque)}
-                </TableCell>
-                <TableCell className="text-text-secondary">
-                  {formatDate(order.previsao)}
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center space-x-2">
@@ -293,7 +313,7 @@ export default function OrdersTable({ filters, onFiltersChange }: OrdersTablePro
             ))}
             {orders.length === 0 && (
               <TableRow>
-                <TableCell colSpan={12} className="text-center py-8 text-text-secondary">
+                <TableCell colSpan={11} className="text-center py-8 text-text-secondary">
                   Nenhum pedido encontrado
                 </TableCell>
               </TableRow>

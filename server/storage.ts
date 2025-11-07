@@ -212,6 +212,9 @@ class Storage implements IStorage {
         observacao: orderData.observacao,
         situacao: orderData.situacao || 'pendente',
         semana: orderData.semana,
+        moeda: orderData.moeda || 'BRL',
+        via_transporte: orderData.viaTransporte,
+        incoterm: orderData.incoterm,
       })
       .select()
       .single();
@@ -281,6 +284,9 @@ class Storage implements IStorage {
     if (orderData.observacao !== undefined) updatePayload.observacao = orderData.observacao;
     if (orderData.situacao !== undefined) updatePayload.situacao = orderData.situacao;
     if (orderData.semana !== undefined) updatePayload.semana = orderData.semana;
+    if (orderData.moeda !== undefined) updatePayload.moeda = orderData.moeda;
+    if (orderData.viaTransporte !== undefined) updatePayload.via_transporte = orderData.viaTransporte;
+    if (orderData.incoterm !== undefined) updatePayload.incoterm = orderData.incoterm;
 
     updatePayload.updated_at = new Date().toISOString();
 
@@ -386,11 +392,30 @@ class Storage implements IStorage {
       console.error('Error getting entregado stats:', entregadoError);
     }
 
+    const { data: ordersData, error: ordersError } = await supabase
+      .from('orders')
+      .select('moeda, total_guia');
+
+    if (ordersError) {
+      console.error('Error getting orders for currency stats:', ordersError);
+    }
+
+    const currencyTotals = ordersData?.reduce((acc: any, order: any) => {
+      const currency = order.moeda || 'BRL';
+      const amount = parseFloat(order.total_guia || '0');
+      if (!acc[currency]) {
+        acc[currency] = 0;
+      }
+      acc[currency] += amount;
+      return acc;
+    }, {}) || {};
+
     const stats = {
       total: total || 0,
       pendiente: pendiente || 0,
       transito: transito || 0,
       entregado: entregado || 0,
+      currencyTotals,
     };
 
     console.log('📊 Order Stats:', stats);

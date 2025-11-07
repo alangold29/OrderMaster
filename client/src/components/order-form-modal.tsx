@@ -76,6 +76,9 @@ export default function OrderFormModal({ isOpen, onClose, order }: OrderFormModa
       observacao: "",
       situacao: "pendiente",
       semana: "",
+      moeda: "BRL",
+      viaTransporte: undefined,
+      incoterm: undefined,
     },
   });
 
@@ -105,6 +108,9 @@ export default function OrderFormModal({ isOpen, onClose, order }: OrderFormModa
         observacao: order.observacao || "",
         situacao: order.situacao || "pendiente",
         semana: order.semana || "",
+        moeda: (order as any).moeda || "BRL",
+        viaTransporte: (order as any).viaTransporte || undefined,
+        incoterm: (order as any).incoterm || undefined,
       });
     } else if (!isOpen) {
       form.reset();
@@ -293,7 +299,30 @@ export default function OrderFormModal({ isOpen, onClose, order }: OrderFormModa
                   />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="moeda"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Moneda *</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Seleccione..." />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="BRL">Real (BRL)</SelectItem>
+                            <SelectItem value="USD">Dólar (USD)</SelectItem>
+                            <SelectItem value="EUR">Euro (EUR)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
                   <FormField
                     control={form.control}
                     name="quantidade"
@@ -618,6 +647,55 @@ export default function OrderFormModal({ isOpen, onClose, order }: OrderFormModa
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
+                    name="viaTransporte"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Vía de Transporte</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Seleccione..." />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="terrestre">Terrestre</SelectItem>
+                            <SelectItem value="maritimo">Marítimo</SelectItem>
+                            <SelectItem value="aereo">Aéreo</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="incoterm"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Incoterm</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Seleccione..." />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="CIF">CIF - Cost, Insurance and Freight</SelectItem>
+                            <SelectItem value="FOB">FOB - Free On Board</SelectItem>
+                            <SelectItem value="FCA">FCA - Free Carrier</SelectItem>
+                            <SelectItem value="CFR">CFR - Cost and Freight</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
                     name="portoEmbarque"
                     render={({ field }) => (
                       <FormItem>
@@ -689,35 +767,33 @@ export default function OrderFormModal({ isOpen, onClose, order }: OrderFormModa
                   />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="condicao"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Condición de Pago</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Ej: FOB, CIF..." {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                <FormField
+                  control={form.control}
+                  name="condicao"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Condición de Pago</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Condición de pago..." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-                  <FormField
-                    control={form.control}
-                    name="semana"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Semana</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Ej: W01, W02..." {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                <FormField
+                  control={form.control}
+                  name="semana"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Semana</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Ej: W01, W02..." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </TabsContent>
 
               {/* TAB 4: ADDITIONAL */}

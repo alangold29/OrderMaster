@@ -8,6 +8,11 @@ interface OrderStats {
   pendiente: number;
   transito: number;
   entregado: number;
+  currencyTotals?: {
+    BRL?: number;
+    USD?: number;
+    EUR?: number;
+  };
 }
 
 interface FinancialStats {
@@ -83,16 +88,36 @@ export default function Analytics() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Valor Total</CardTitle>
+            <CardTitle className="text-sm font-medium">Totales por Moneda</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              R$ {financialStats?.totalValue?.toLocaleString('pt-BR') || '0'}
+            <div className="space-y-2">
+              {orderStats?.currencyTotals?.BRL !== undefined && orderStats.currencyTotals.BRL > 0 && (
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium">BRL:</span>
+                  <span className="text-lg font-bold">
+                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(orderStats.currencyTotals.BRL)}
+                  </span>
+                </div>
+              )}
+              {orderStats?.currencyTotals?.USD !== undefined && orderStats.currencyTotals.USD > 0 && (
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium">USD:</span>
+                  <span className="text-lg font-bold">
+                    {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(orderStats.currencyTotals.USD)}
+                  </span>
+                </div>
+              )}
+              {orderStats?.currencyTotals?.EUR !== undefined && orderStats.currencyTotals.EUR > 0 && (
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium">EUR:</span>
+                  <span className="text-lg font-bold">
+                    {new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(orderStats.currencyTotals.EUR)}
+                  </span>
+                </div>
+              )}
             </div>
-            <p className="text-xs text-muted-foreground">
-              Média: R$ {financialStats?.averageOrderValue?.toLocaleString('pt-BR') || '0'}
-            </p>
           </CardContent>
         </Card>
 

@@ -51,6 +51,9 @@ export const orders = pgTable("orders", {
   observacao: text("observacao"),
   situacao: text("situacao").notNull().default("pendiente"),
   semana: text("semana"),
+  moeda: text("moeda").notNull().default("BRL"),
+  viaTransporte: text("via_transporte"),
+  incoterm: text("incoterm"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -126,6 +129,9 @@ export const insertOrderSchema = createInsertSchema(orders).omit({
   previsao: optionalStringTransform,
   chegada: optionalStringTransform,
   dataEmissaoPedido: optionalStringTransform,
+  moeda: z.enum(["BRL", "USD", "EUR"]).default("BRL"),
+  viaTransporte: z.enum(["terrestre", "maritimo", "aereo"]).optional(),
+  incoterm: z.enum(["CIF", "FOB", "FCA", "CFR"]).optional(),
 });
 
 export const updateOrderSchema = insertOrderSchema.partial();

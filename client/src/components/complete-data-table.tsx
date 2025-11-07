@@ -331,7 +331,10 @@ export default function CompleteDataTable({
                   <TableHead>Cliente</TableHead>
                   <TableHead>Produto</TableHead>
                   <TableHead className="text-right">Quantidade</TableHead>
+                  <TableHead>Moneda</TableHead>
                   <TableHead className="text-right">Valor Total</TableHead>
+                  <TableHead>Transporte</TableHead>
+                  <TableHead>Incoterm</TableHead>
                   <TableHead>Situação</TableHead>
                   <TableHead>Porto Embarque</TableHead>
                   <TableHead>Porto Destino</TableHead>
@@ -381,8 +384,27 @@ export default function CompleteDataTable({
                       <TableCell className="text-right font-medium">
                         {order.quantidade?.toLocaleString('pt-BR') || "-"}
                       </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="font-mono">
+                          {order.moeda || "BRL"}
+                        </Badge>
+                      </TableCell>
                       <TableCell className="text-right font-medium">
                         {formatCurrency(order.totalGuia || 0)}
+                      </TableCell>
+                      <TableCell>
+                        {order.viaTransporte ? (
+                          <Badge variant="secondary" className="capitalize">
+                            {order.viaTransporte}
+                          </Badge>
+                        ) : "-"}
+                      </TableCell>
+                      <TableCell>
+                        {order.incoterm ? (
+                          <Badge variant="outline">
+                            {order.incoterm}
+                          </Badge>
+                        ) : "-"}
                       </TableCell>
                       <TableCell>
                         <Badge className={statusColors[order.situacao as keyof typeof statusColors] || "bg-gray-100 text-gray-800"}>
@@ -405,7 +427,7 @@ export default function CompleteDataTable({
                     {/* Expanded Row with Additional Details */}
                     {expandedRows.has(order.id) && (
                       <TableRow className="bg-muted/30">
-                        <TableCell colSpan={12}>
+                        <TableCell colSpan={13}>
                           <div className="p-4 space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                               <div>
@@ -415,19 +437,22 @@ export default function CompleteDataTable({
                                   <p><span className="font-medium">Ref. Importador:</span> {order.referenciaImportador || "-"}</p>
                                   <p><span className="font-medium">Preço Guia:</span> {formatCurrency(order.precoGuia || 0)}</p>
                                   <p><span className="font-medium">Produtor:</span> {order.producer?.name || "-"}</p>
+                                  <p><span className="font-medium">Moneda:</span> <Badge variant="outline">{order.moeda || "BRL"}</Badge></p>
                                 </div>
                               </div>
-                              
+
                               <div>
                                 <h4 className="font-semibold text-sm mb-2">Logística</h4>
                                 <div className="space-y-1 text-sm">
+                                  <p><span className="font-medium">Vía Transporte:</span> {order.viaTransporte ? <Badge variant="secondary" className="capitalize">{order.viaTransporte}</Badge> : "-"}</p>
+                                  <p><span className="font-medium">Incoterm:</span> {order.incoterm ? <Badge variant="outline">{order.incoterm}</Badge> : "-"}</p>
                                   <p><span className="font-medium">Condição:</span> {order.condicao || "-"}</p>
                                   <p><span className="font-medium">Previsão:</span> {formatDate(order.previsao)}</p>
                                   <p><span className="font-medium">Chegada:</span> {formatDate(order.chegada)}</p>
                                   <p><span className="font-medium">Etiqueta:</span> {order.etiqueta || "-"}</p>
                                 </div>
                               </div>
-                              
+
                               <div>
                                 <h4 className="font-semibold text-sm mb-2">Observações</h4>
                                 <div className="space-y-1 text-sm">
