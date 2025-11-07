@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Edit, Trash2, ArrowUpDown } from "lucide-react";
 import OrderFormModal from "@/components/order-form-modal";
 import type { OrderWithRelations } from "@shared/schema";
-import { formatCurrency, type Currency } from "@/lib/currency-formatter";
 import {
   Table,
   TableBody,
@@ -154,8 +153,12 @@ export default function OrdersTable({ filters, onFiltersChange }: OrdersTablePro
     );
   };
 
-  const formatAmount = (value: string | number, currency: Currency = 'BRL') => {
-    return formatCurrency(value, currency);
+  const formatCurrency = (value: string | number) => {
+    const num = typeof value === "string" ? parseFloat(value) : value;
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(num || 0);
   };
 
   const formatDate = (dateString: string) => {
@@ -231,7 +234,6 @@ export default function OrdersTable({ filters, onFiltersChange }: OrdersTablePro
               <TableHead>Produtor</TableHead>
               <TableHead>Itens</TableHead>
               <TableHead>Quantidade</TableHead>
-              <TableHead>Moneda</TableHead>
               <TableHead>Situação</TableHead>
               <TableHead>Embarque</TableHead>
               <TableHead>Previsão</TableHead>
@@ -258,11 +260,6 @@ export default function OrdersTable({ filters, onFiltersChange }: OrdersTablePro
                 <TableCell>{order.itens || "-"}</TableCell>
                 <TableCell className="text-text-secondary">
                   {order.quantidade || "-"}
-                </TableCell>
-                <TableCell>
-                  <Badge variant="outline" className="font-mono text-xs">
-                    {order.moeda || 'BRL'}
-                  </Badge>
                 </TableCell>
                 <TableCell>{getStatusBadge(order.situacao)}</TableCell>
                 <TableCell className="text-text-secondary">
@@ -296,7 +293,7 @@ export default function OrdersTable({ filters, onFiltersChange }: OrdersTablePro
             ))}
             {orders.length === 0 && (
               <TableRow>
-                <TableCell colSpan={13} className="text-center py-8 text-text-secondary">
+                <TableCell colSpan={12} className="text-center py-8 text-text-secondary">
                   Nenhum pedido encontrado
                 </TableCell>
               </TableRow>

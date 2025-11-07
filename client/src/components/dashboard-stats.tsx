@@ -2,15 +2,13 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { ShoppingCart, Clock, Truck, CheckCircle } from "lucide-react";
 
-interface OrderStats {
-  total: number;
-  pendiente: number;
-  transito: number;
-  entregado: number;
-}
-
 export default function DashboardStats() {
-  const { data: stats, isLoading } = useQuery<OrderStats>({
+  const { data: stats, isLoading } = useQuery<{
+    total: number;
+    pendiente: number;
+    transito: number;
+    entregado: number;
+  }>({
     queryKey: ["/api/stats"],
   });
 
@@ -40,49 +38,42 @@ export default function DashboardStats() {
       value: stats?.total || 0,
       icon: ShoppingCart,
       color: "text-primary",
-      subtitle: "Todos los pedidos"
     },
     {
       title: "Pendientes",
       value: stats?.pendiente || 0,
       icon: Clock,
       color: "text-pending",
-      subtitle: "Por procesar"
     },
     {
       title: "En Tránsito",
       value: stats?.transito || 0,
       icon: Truck,
       color: "text-in-transit",
-      subtitle: "En camino"
     },
     {
       title: "Entregados",
       value: stats?.entregado || 0,
       icon: CheckCircle,
       color: "text-delivered",
-      subtitle: "Completados"
     },
   ];
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
       {statItems.map((item) => (
-        <Card key={item.title} className="bg-surface border border-gray-200 hover:shadow-md transition-shadow">
+        <Card key={item.title} className="bg-surface border border-gray-200">
           <CardContent className="p-6">
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <item.icon className={`${item.color} h-6 w-6`} />
               </div>
-              <div className="ml-4 flex-1">
+              <div className="ml-4">
                 <p className="text-sm font-medium text-text-secondary">
                   {item.title}
                 </p>
                 <p className="text-2xl font-semibold text-text-primary">
                   {item.value.toLocaleString()}
-                </p>
-                <p className="text-xs text-text-secondary mt-1">
-                  {item.subtitle}
                 </p>
               </div>
             </div>

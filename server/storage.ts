@@ -200,14 +200,11 @@ class Storage implements IStorage {
         itens: orderData.itens,
         preco_guia: orderData.precoGuia,
         total_guia: orderData.totalGuia,
-        moeda: orderData.moeda || 'BRL',
         producer_id: producerId,
         client_id: clientId,
         etiqueta: orderData.etiqueta,
         porto_embarque: orderData.portoEmbarque,
         porto_destino: orderData.portoDestino,
-        via_transporte: orderData.viaTransporte || null,
-        incoterm: orderData.incoterm || null,
         condicao: orderData.condicao,
         embarque: orderData.embarque,
         previsao: orderData.previsao,
@@ -272,14 +269,11 @@ class Storage implements IStorage {
     if (orderData.itens !== undefined) updatePayload.itens = orderData.itens;
     if (orderData.precoGuia !== undefined) updatePayload.preco_guia = orderData.precoGuia;
     if (orderData.totalGuia !== undefined) updatePayload.total_guia = orderData.totalGuia;
-    if (orderData.moeda !== undefined) updatePayload.moeda = orderData.moeda;
     if (producerId !== undefined) updatePayload.producer_id = producerId;
     if (clientId !== undefined) updatePayload.client_id = clientId;
     if (orderData.etiqueta !== undefined) updatePayload.etiqueta = orderData.etiqueta;
     if (orderData.portoEmbarque !== undefined) updatePayload.porto_embarque = orderData.portoEmbarque;
     if (orderData.portoDestino !== undefined) updatePayload.porto_destino = orderData.portoDestino;
-    if (orderData.viaTransporte !== undefined) updatePayload.via_transporte = orderData.viaTransporte || null;
-    if (orderData.incoterm !== undefined) updatePayload.incoterm = orderData.incoterm || null;
     if (orderData.condicao !== undefined) updatePayload.condicao = orderData.condicao;
     if (orderData.embarque !== undefined) updatePayload.embarque = orderData.embarque;
     if (orderData.previsao !== undefined) updatePayload.previsao = orderData.previsao;
@@ -407,30 +401,24 @@ class Storage implements IStorage {
   async getFinancialStats() {
     const { data: orders, error } = await supabase
       .from('orders')
-      .select('total_guia, situacao, moeda');
+      .select('total_guia, situacao');
 
     if (error) throw error;
 
-    const statsByCurrency = orders?.reduce((acc, order) => {
+    const stats = orders?.reduce((acc, order) => {
       const amount = parseFloat(order.total_guia || '0');
-      const currency = order.moeda || 'BRL';
-
-      if (!acc[currency]) {
-        acc[currency] = { totalReceivable: 0, totalPaid: 0, pendingPayment: 0, overdueAmount: 0 };
-      }
-
-      acc[currency].totalReceivable += amount;
+      acc.totalReceivable += amount;
 
       if (order.situacao === 'entregado') {
-        acc[currency].totalPaid += amount;
+        acc.totalPaid += amount;
       } else if (order.situacao === 'pendiente') {
-        acc[currency].pendingPayment += amount;
+        acc.pendingPayment += amount;
       }
 
       return acc;
-    }, {} as Record<string, { totalReceivable: number; totalPaid: number; pendingPayment: number; overdueAmount: number }>) || {};
+    }, { totalReceivable: 0, totalPaid: 0, pendingPayment: 0, overdueAmount: 0 }) || { totalReceivable: 0, totalPaid: 0, pendingPayment: 0, overdueAmount: 0 };
 
-    return statsByCurrency;
+    return stats;
   }
 
   async getRecentOrders() {
