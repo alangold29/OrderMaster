@@ -105,65 +105,41 @@ export default function DashboardStats() {
 
       {stats?.currencyTotals && Object.keys(stats.currencyTotals).length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {stats.currencyTotals.BRL !== undefined && stats.currencyTotals.BRL > 0 && (
-            <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-green-700 mb-1">
-                      Total en Real (BRL)
-                    </p>
-                    <p className="text-2xl font-bold text-green-900">
+          <Card className="bg-surface border border-gray-200">
+            <CardContent className="p-6">
+              <div className="space-y-3">
+                <div>
+                  <p className="text-sm font-medium text-text-secondary mb-2">
+                    Total por Moneda
+                  </p>
+                </div>
+                {stats.currencyTotals.BRL !== undefined && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-text-secondary">Quitado:</span>
+                    <span className="text-base font-semibold text-green-700">
                       {formatCurrency(stats.currencyTotals.BRL, "BRL")}
-                    </p>
+                    </span>
                   </div>
-                  <div className="h-12 w-12 bg-green-500 rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold text-lg">R$</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {stats.currencyTotals.USD !== undefined && stats.currencyTotals.USD > 0 && (
-            <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-blue-700 mb-1">
-                      Total en Dólar (USD)
-                    </p>
-                    <p className="text-2xl font-bold text-blue-900">
+                )}
+                {stats.currencyTotals.USD !== undefined && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-text-secondary">Quitado:</span>
+                    <span className="text-base font-semibold text-blue-700">
                       {formatCurrency(stats.currencyTotals.USD, "USD")}
-                    </p>
+                    </span>
                   </div>
-                  <div className="h-12 w-12 bg-blue-500 rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold text-lg">$</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {stats.currencyTotals.EUR !== undefined && stats.currencyTotals.EUR > 0 && (
-            <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-purple-700 mb-1">
-                      Total en Euro (EUR)
-                    </p>
-                    <p className="text-2xl font-bold text-purple-900">
+                )}
+                {stats.currencyTotals.EUR !== undefined && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-text-secondary">Quitado:</span>
+                    <span className="text-base font-semibold text-purple-700">
                       {formatCurrency(stats.currencyTotals.EUR, "EUR")}
-                    </p>
+                    </span>
                   </div>
-                  <div className="h-12 w-12 bg-purple-500 rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold text-lg">€</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       )}
     </>
