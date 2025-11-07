@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Import, Bell, User } from "lucide-react";
 import DashboardStats from "@/components/dashboard-stats";
+import CurrencyVisualStats from "@/components/currency-visual-stats";
 import OrdersTable from "@/components/orders-table";
 import FiltersSection from "@/components/filters-section";
 import OrderFormModal from "@/components/order-form-modal";
@@ -57,6 +58,11 @@ export default function Dashboard() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Dashboard Statistics */}
         <DashboardStats />
+
+        {/* Currency Visual Statistics */}
+        <div className="mb-8">
+          <CurrencyVisualStats />
+        </div>
 
         {/* Orders Section */}
         <Card className="bg-surface border border-gray-200">
