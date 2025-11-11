@@ -35,18 +35,34 @@ interface RecentOrders {
 export default function Analytics() {
   const { data: orderStats } = useQuery<OrderStats>({
     queryKey: ["/api/stats"],
+    queryFn: async () => {
+      const { storage } = await import('@/lib/storage');
+      return storage.getOrderStats();
+    },
   });
 
   const { data: financialStats } = useQuery<FinancialStats>({
     queryKey: ["/api/stats/financial"],
+    queryFn: async () => {
+      const { storage } = await import('@/lib/storage');
+      return storage.getFinancialStats();
+    },
   });
 
   const { data: recentOrders } = useQuery<RecentOrders[]>({
     queryKey: ["/api/analytics/recent-orders"],
+    queryFn: async () => {
+      const { storage } = await import('@/lib/storage');
+      return storage.getRecentOrders();
+    },
   });
 
   const { data: upcomingShipments } = useQuery<RecentOrders[]>({
     queryKey: ["/api/analytics/upcoming-shipments"],
+    queryFn: async () => {
+      const { storage } = await import('@/lib/storage');
+      return storage.getUpcomingShipments();
+    },
   });
 
   return (

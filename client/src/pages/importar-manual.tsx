@@ -142,19 +142,43 @@ export default function ImportarManual() {
 
     setIsProcessing(true);
     try {
-      const response = await fetch('/api/import/manual', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ orders: previewData }),
-      });
+      const { storage } = await import('@/lib/storage');
+      const { insertOrderSchema } = await import('@shared/schema');
 
-      if (!response.ok) {
-        throw new Error('Error al importar los datos');
+      const results = [];
+      let successful = 0;
+      let failed = 0;
+
+      for (let i = 0; i < previewData.length; i++) {
+        try {
+          const orderData = previewData[i];
+          const validatedData = insertOrderSchema.parse(orderData);
+          await storage.createOrder(validatedData);
+
+          results.push({
+            row: i + 1,
+            pedido: orderData.pedido,
+            success: true,
+          });
+          successful++;
+        } catch (error) {
+          results.push({
+            row: i + 1,
+            pedido: previewData[i]?.pedido || `Fila ${i + 1}`,
+            success: false,
+            error: error instanceof Error ? error.message : String(error),
+          });
+          failed++;
+        }
       }
 
-      const result = await response.json();
+      const result = {
+        total: previewData.length,
+        successful,
+        failed,
+        results,
+      };
+
       setImportSummary(result);
       queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
 

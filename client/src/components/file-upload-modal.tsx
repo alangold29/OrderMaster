@@ -24,19 +24,79 @@ export default function FileUploadModal({ isOpen, onClose }: FileUploadModalProp
 
   const uploadMutation = useMutation({
     mutationFn: async (file: File) => {
-      const formData = new FormData();
-      formData.append("file", file);
-      
-      const response = await fetch("/api/import/excel", {
-        method: "POST",
-        body: formData,
-      });
-      
-      if (!response.ok) {
-        throw new Error("Failed to upload file");
+      const XLSX = await import('xlsx');
+      const { storage } = await import('@/lib/storage');
+      const { insertOrderSchema } = await import('@shared/schema');
+
+      const buffer = await file.arrayBuffer();
+      const workbook = XLSX.read(buffer, { type: "array" });
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      const data = XLSX.utils.sheet_to_json(worksheet);
+
+      const orders = [];
+      const errors = [];
+
+      for (let i = 0; i < data.length; i++) {
+        try {
+          const row = data[i] as any;
+
+          const rowKeys = Object.keys(row);
+          const referenciaExportador = rowKeys.find(key => key.includes('REFERÊNCIA') && rowKeys.indexOf(key) < rowKeys.indexOf('IMPORTADOR')) || 'REFERÊNCIA';
+          const referenciaImportador = rowKeys.find(key => key.includes('REFERÊNCIA') && rowKeys.indexOf(key) > rowKeys.indexOf('IMPORTADOR')) || 'REFERÊNCIA__1';
+
+          const toString = (value: any) => {
+            if (value === null || value === undefined) return "";
+            if (typeof value === 'number') {
+              if (value > 40000 && value < 50000) {
+                const date = new Date((value - 25569) * 86400 * 1000);
+                return date.toISOString().split('T')[0];
+              }
+              return value.toString();
+            }
+            return String(value);
+          };
+
+          const orderData = {
+            pedido: toString(row.PEDIDO || row.pedido),
+            data: toString(row.DATA || row.data),
+            exporterName: toString(row.EXPORTADOR || row.exportador),
+            referenciaExportador: toString(row[referenciaExportador] || row.referenciaExportador),
+            importerName: toString(row.IMPORTADOR || row.importador),
+            referenciaImportador: toString(row[referenciaImportador] || row.referenciaImportador),
+            quantidade: toString(row.QUANTIDADE || row.quantidade || "0"),
+            itens: toString(row.ITENS || row.itens),
+            precoGuia: toString(row["PREÇO GUIA"] || row.precoGuia || "0"),
+            totalGuia: toString(row["TOTAL GUIA"] || row.totalGuia || "0"),
+            producerName: toString(row.PRODUTOR || row.produtor),
+            clientName: toString(row.CLIENTE || row.cliente),
+            etiqueta: toString(row.ETIQUETA || row.etiqueta),
+            portoEmbarque: toString(row["PORTO EMBARQUE"] || row.portoEmbarque),
+            portoDestino: toString(row["PORTO DESTINO"] || row.portoDestino),
+            condicao: toString(row["CONDIÇÃO"] || row.condicao),
+            embarque: toString(row.EMBARQUE || row.embarque),
+            previsao: toString(row["PREVISÃO"] || row.previsao),
+            chegada: toString(row.CHEGADA || row.chegada),
+            observacao: toString(row["OBSERVAÇÃO"] || row.observacao),
+            situacao: toString(row["SITUAÇÃO"] || row.situacao) || "pendiente",
+            semana: toString(row.SEMANA || row.semana),
+          };
+
+          const validatedData = insertOrderSchema.parse(orderData);
+          const order = await storage.createOrder(validatedData);
+          orders.push(order);
+        } catch (error) {
+          errors.push({ row: i + 1, error: error instanceof Error ? error.message : String(error) });
+        }
       }
-      
-      return response.json();
+
+      return {
+        success: true,
+        imported: orders.length,
+        errors,
+        totalRows: data.length,
+        orders,
+      };
     },
     onSuccess: (data) => {
       toast({

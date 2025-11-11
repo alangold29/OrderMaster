@@ -71,7 +71,8 @@ export function UserFormModal({ user, isOpen, onClose }: UserFormModalProps) {
 
   const createUserMutation = useMutation({
     mutationFn: async (data: Omit<FormData, "confirmEmail">) => {
-      return await apiRequest("/api/company-users", "POST", data);
+      const { storage } = await import('@/lib/storage');
+      return await storage.createCompanyUser(data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/company-users"] });
@@ -93,7 +94,8 @@ export function UserFormModal({ user, isOpen, onClose }: UserFormModalProps) {
 
   const updateUserMutation = useMutation({
     mutationFn: async (data: Omit<FormData, "confirmEmail">) => {
-      return await apiRequest(`/api/company-users/${user!.id}`, "PUT", data);
+      const { storage } = await import('@/lib/storage');
+      return await storage.updateCompanyUser(user!.id, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/company-users"] });

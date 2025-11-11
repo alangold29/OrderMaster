@@ -70,7 +70,8 @@ export function UserPermissionsModal({ user, isOpen, onClose }: UserPermissionsM
 
   const updatePermissionsMutation = useMutation({
     mutationFn: async (newPermissions: PermissionState) => {
-      return await apiRequest(`/api/company-users/${user!.id}/permissions`, "PATCH", { permissions: newPermissions });
+      const { storage } = await import('@/lib/storage');
+      return await storage.updateUserPermissions(user!.id, newPermissions);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/company-users"] });

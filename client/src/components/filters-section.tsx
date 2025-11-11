@@ -32,10 +32,34 @@ interface FiltersProps {
 export default function FiltersSection({ filters, onFiltersChange }: FiltersProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const { data: clients } = useQuery<any[]>({ queryKey: ["/api/clients"] });
-  const { data: exporters } = useQuery<any[]>({ queryKey: ["/api/exporters"] });
-  const { data: importers } = useQuery<any[]>({ queryKey: ["/api/importers"] });
-  const { data: producers } = useQuery<any[]>({ queryKey: ["/api/producers"] });
+  const { data: clients } = useQuery<any[]>({
+    queryKey: ["/api/clients"],
+    queryFn: async () => {
+      const { storage } = await import('@/lib/storage');
+      return storage.getClients();
+    },
+  });
+  const { data: exporters } = useQuery<any[]>({
+    queryKey: ["/api/exporters"],
+    queryFn: async () => {
+      const { storage } = await import('@/lib/storage');
+      return storage.getExporters();
+    },
+  });
+  const { data: importers } = useQuery<any[]>({
+    queryKey: ["/api/importers"],
+    queryFn: async () => {
+      const { storage } = await import('@/lib/storage');
+      return storage.getImporters();
+    },
+  });
+  const { data: producers } = useQuery<any[]>({
+    queryKey: ["/api/producers"],
+    queryFn: async () => {
+      const { storage } = await import('@/lib/storage');
+      return storage.getProducers();
+    },
+  });
 
   const handleFilterChange = (key: string, value: string) => {
     const finalValue = value === "all" ? "" : value;

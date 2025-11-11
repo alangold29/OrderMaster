@@ -56,19 +56,8 @@ export default function Embarques() {
   const { data: ordersData, isLoading } = useQuery({
     queryKey: ["/api/orders", ordersFilters],
     queryFn: async () => {
-      const searchParams = new URLSearchParams();
-      
-      Object.entries(ordersFilters).forEach(([key, value]) => {
-        if (value && value !== "") {
-          searchParams.append(key, value.toString());
-        }
-      });
-
-      const response = await fetch(`/api/orders?${searchParams}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch orders");
-      }
-      return response.json();
+      const { storage } = await import('@/lib/storage');
+      return storage.getOrders(ordersFilters);
     },
   });
 

@@ -15,6 +15,10 @@ export default function DashboardStats() {
     };
   }>({
     queryKey: ["/api/stats"],
+    queryFn: async () => {
+      const { storage } = await import('@/lib/storage');
+      return storage.getOrderStats();
+    },
   });
 
   if (isLoading) {

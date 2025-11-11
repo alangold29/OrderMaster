@@ -1,4 +1,4 @@
-import { supabase } from './supabase-client';
+import { supabase } from './supabase';
 import type {
   Order,
   Client,
@@ -6,35 +6,7 @@ import type {
   Importer,
   Producer,
   CompanyUser,
-  OrderWithRelations,
 } from "@shared/schema";
-
-export interface IStorage {
-  getOrders(params: any): Promise<any>;
-  getOrderById(id: string): Promise<any>;
-  createOrder(data: any): Promise<any>;
-  updateOrder(id: string, data: any): Promise<any>;
-  deleteOrder(id: string): Promise<void>;
-  getClients(): Promise<Client[]>;
-  getExporters(): Promise<Exporter[]>;
-  getImporters(): Promise<Importer[]>;
-  getProducers(): Promise<Producer[]>;
-  getOrderStats(): Promise<any>;
-  getFinancialStats(): Promise<any>;
-  getRecentOrders(): Promise<any[]>;
-  getUpcomingShipments(): Promise<any[]>;
-  getCompanyUsers(): Promise<CompanyUser[]>;
-  getCompanyUser(id: string): Promise<CompanyUser | null>;
-  createCompanyUser(data: any): Promise<CompanyUser>;
-  updateCompanyUser(id: string, data: any): Promise<CompanyUser>;
-  deleteCompanyUser(id: string): Promise<void>;
-  updateUserPermissions(id: string, permissions: any): Promise<CompanyUser>;
-  updateUserRole(id: string, role: string): Promise<CompanyUser>;
-  toggleUserActive(id: string): Promise<CompanyUser>;
-  getFinancialSummary(): Promise<any>;
-  getAccountsReceivable(): Promise<any[]>;
-  getClientFinancials(clientId: string): Promise<any>;
-}
 
 async function getOrCreateEntity(
   table: string,
@@ -63,7 +35,7 @@ async function getOrCreateEntity(
   return created.id;
 }
 
-class Storage implements IStorage {
+export const storage = {
   async getOrders(params: any) {
     const page = params.page || 1;
     const limit = params.limit || 10;
@@ -136,12 +108,7 @@ class Storage implements IStorage {
       .order(params.sortBy || 'data', { ascending: params.sortOrder === 'asc' })
       .range(from, to);
 
-    if (error) {
-      console.error('Supabase error in getOrders:', error);
-      throw error;
-    }
-
-    console.log(`getOrders: Found ${count} total orders, returning ${orders?.length || 0} for page ${page}`);
+    if (error) throw error;
 
     return {
       orders: orders || [],
@@ -150,7 +117,7 @@ class Storage implements IStorage {
       limit,
       totalPages: Math.ceil((count || 0) / limit),
     };
-  }
+  },
 
   async getOrderById(id: string) {
     const { data, error } = await supabase
@@ -167,7 +134,7 @@ class Storage implements IStorage {
 
     if (error) throw error;
     return data;
-  }
+  },
 
   async createOrder(orderData: any) {
     const { data: existingOrder } = await supabase
@@ -221,7 +188,7 @@ class Storage implements IStorage {
 
     if (error) throw error;
     return data;
-  }
+  },
 
   async updateOrder(id: string, orderData: any) {
     const { data: existingOrder } = await supabase
@@ -231,7 +198,7 @@ class Storage implements IStorage {
       .maybeSingle();
 
     if (!existingOrder) {
-      throw new Error('Pedido no encontrado');
+      throw new Error('Pedido não encontrado');
     }
 
     if (orderData.pedido && orderData.pedido !== existingOrder.pedido) {
@@ -243,7 +210,7 @@ class Storage implements IStorage {
         .maybeSingle();
 
       if (duplicateOrder) {
-        throw new Error(`Pedido duplicado: ya existe un pedido con el número ${orderData.pedido}`);
+        throw new Error(`Pedido duplicado: já existe um pedido com o número ${orderData.pedido}`);
       }
     }
 
@@ -305,7 +272,7 @@ class Storage implements IStorage {
 
     if (error) throw error;
     return updated;
-  }
+  },
 
   async deleteOrder(id: string) {
     const { error } = await supabase
@@ -314,7 +281,7 @@ class Storage implements IStorage {
       .eq('id', id);
 
     if (error) throw error;
-  }
+  },
 
   async getClients() {
     const { data, error } = await supabase
@@ -324,7 +291,7 @@ class Storage implements IStorage {
 
     if (error) throw error;
     return data || [];
-  }
+  },
 
   async getExporters() {
     const { data, error } = await supabase
@@ -334,7 +301,7 @@ class Storage implements IStorage {
 
     if (error) throw error;
     return data || [];
-  }
+  },
 
   async getImporters() {
     const { data, error } = await supabase
@@ -344,7 +311,7 @@ class Storage implements IStorage {
 
     if (error) throw error;
     return data || [];
-  }
+  },
 
   async getProducers() {
     const { data, error } = await supabase
@@ -354,7 +321,7 @@ class Storage implements IStorage {
 
     if (error) throw error;
     return data || [];
-  }
+  },
 
   async getOrderStats() {
     const { count: total, error: totalError } = await supabase
@@ -410,18 +377,14 @@ class Storage implements IStorage {
       return acc;
     }, {}) || {};
 
-    const stats = {
+    return {
       total: total || 0,
       pendiente: pendiente || 0,
       transito: transito || 0,
       entregado: entregado || 0,
       currencyTotals,
     };
-
-    console.log('📊 Order Stats:', stats);
-
-    return stats;
-  }
+  },
 
   async getFinancialStats() {
     const { data: orders, error } = await supabase
@@ -444,7 +407,7 @@ class Storage implements IStorage {
     }, { totalReceivable: 0, totalPaid: 0, pendingPayment: 0, overdueAmount: 0 }) || { totalReceivable: 0, totalPaid: 0, pendingPayment: 0, overdueAmount: 0 };
 
     return stats;
-  }
+  },
 
   async getRecentOrders() {
     const { data, error } = await supabase
@@ -458,7 +421,7 @@ class Storage implements IStorage {
 
     if (error) throw error;
     return data || [];
-  }
+  },
 
   async getUpcomingShipments() {
     const { data, error } = await supabase
@@ -473,7 +436,7 @@ class Storage implements IStorage {
 
     if (error) throw error;
     return data || [];
-  }
+  },
 
   async getCompanyUsers() {
     const { data, error } = await supabase
@@ -483,7 +446,7 @@ class Storage implements IStorage {
 
     if (error) throw error;
     return data || [];
-  }
+  },
 
   async getCompanyUser(id: string) {
     const { data, error } = await supabase
@@ -494,11 +457,9 @@ class Storage implements IStorage {
 
     if (error) throw error;
     return data;
-  }
+  },
 
   async createCompanyUser(userData: any) {
-    console.log("storage.createCompanyUser - INPUT:", JSON.stringify(userData));
-
     const insertData = {
       email: userData.email,
       name: userData.name,
@@ -508,22 +469,15 @@ class Storage implements IStorage {
       permissions: userData.permissions || {}
     };
 
-    console.log("storage.createCompanyUser - INSERTING:", JSON.stringify(insertData));
-
     const { data, error } = await supabase
       .from('company_users')
       .insert(insertData)
       .select()
       .single();
 
-    console.log("storage.createCompanyUser - RESULT:", { data, error });
-
-    if (error) {
-      console.error("SUPABASE ERROR:", JSON.stringify(error));
-      throw error;
-    }
+    if (error) throw error;
     return data;
-  }
+  },
 
   async updateCompanyUser(id: string, userData: any) {
     const { data, error } = await supabase
@@ -535,7 +489,7 @@ class Storage implements IStorage {
 
     if (error) throw error;
     return data;
-  }
+  },
 
   async deleteCompanyUser(id: string) {
     const { error } = await supabase
@@ -544,7 +498,7 @@ class Storage implements IStorage {
       .eq('id', id);
 
     if (error) throw error;
-  }
+  },
 
   async updateUserPermissions(id: string, permissions: any) {
     const { data, error } = await supabase
@@ -556,7 +510,7 @@ class Storage implements IStorage {
 
     if (error) throw error;
     return data;
-  }
+  },
 
   async updateUserRole(id: string, role: string) {
     const { data, error } = await supabase
@@ -568,10 +522,10 @@ class Storage implements IStorage {
 
     if (error) throw error;
     return data;
-  }
+  },
 
   async toggleUserActive(id: string) {
-    const user = await this.getCompanyUser(id);
+    const user = await storage.getCompanyUser(id);
     if (!user) throw new Error('User not found');
 
     const { data, error } = await supabase
@@ -583,7 +537,7 @@ class Storage implements IStorage {
 
     if (error) throw error;
     return data;
-  }
+  },
 
   async getFinancialSummary() {
     const { data: orders, error } = await supabase
@@ -610,7 +564,7 @@ class Storage implements IStorage {
       averageOrderValue,
       byStatus,
     };
-  }
+  },
 
   async getAccountsReceivable() {
     const { data: orders, error } = await supabase
@@ -654,7 +608,7 @@ class Storage implements IStorage {
     });
 
     return Array.from(accountsMap.values()).sort((a, b) => b.totalAmount - a.totalAmount);
-  }
+  },
 
   async getClientFinancials(clientId: string) {
     const { data: client, error: clientError } = await supabase
@@ -691,6 +645,4 @@ class Storage implements IStorage {
       totalOrders,
     };
   }
-}
-
-export const storage = new Storage();
+};

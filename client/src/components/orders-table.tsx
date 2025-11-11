@@ -58,7 +58,8 @@ export default function OrdersTable({ filters, onFiltersChange }: OrdersTablePro
 
   const deleteOrderMutation = useMutation({
     mutationFn: async (orderId: string) => {
-      return await apiRequest(`/api/orders/${orderId}`, "DELETE");
+      const { storage } = await import('@/lib/storage');
+      return await storage.deleteOrder(orderId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["orders"] });
@@ -85,34 +86,20 @@ export default function OrdersTable({ filters, onFiltersChange }: OrdersTablePro
   const { data, isLoading, error } = useQuery({
     queryKey: ["orders", filters],
     queryFn: async () => {
-      const params = new URLSearchParams();
-      params.append("page", filters.page.toString());
-      params.append("limit", "10");
-
-      // Only add non-empty parameters to avoid sending empty strings
-      if (filters.search?.trim()) params.append("search", filters.search);
-      if (filters.clientId?.trim()) params.append("clientId", filters.clientId);
-      if (filters.exporterId?.trim()) params.append("exporterId", filters.exporterId);
-      if (filters.importerId?.trim()) params.append("importerId", filters.importerId);
-      if (filters.producerId?.trim()) params.append("producerId", filters.producerId);
-      if (filters.situacao?.trim() && filters.situacao !== "all") params.append("situacao", filters.situacao);
-      if (filters.sortBy?.trim()) params.append("sortBy", filters.sortBy);
-      if (filters.sortOrder?.trim()) params.append("sortOrder", filters.sortOrder);
-
-      const url = `/api/orders?${params}`;
-      console.log("🔍 Fetching orders with URL:", url);
-      console.log("🔍 Active filters:", filters);
-
-      const response = await fetch(url);
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("❌ API Error:", errorText);
-        throw new Error('Network response was not ok');
-      }
-      const result = await response.json();
-      console.log("✅ API Response:", result);
-      console.log(`📊 Found ${result.total} total orders, ${result.orders?.length || 0} on this page`);
-      return result;
+      const { storage } = await import('@/lib/storage');
+      const queryFilters = {
+        page: filters.page,
+        limit: 10,
+        search: filters.search?.trim() || undefined,
+        clientId: filters.clientId?.trim() || undefined,
+        exporterId: filters.exporterId?.trim() || undefined,
+        importerId: filters.importerId?.trim() || undefined,
+        producerId: filters.producerId?.trim() || undefined,
+        situacao: (filters.situacao?.trim() && filters.situacao !== "all") ? filters.situacao : undefined,
+        sortBy: filters.sortBy?.trim() || undefined,
+        sortOrder: filters.sortOrder?.trim() as "asc" | "desc" || undefined,
+      };
+      return storage.getOrders(queryFilters);
     },
   });
 

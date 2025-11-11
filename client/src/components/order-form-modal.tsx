@@ -119,18 +119,34 @@ export default function OrderFormModal({ isOpen, onClose, order }: OrderFormModa
 
   const { data: exporters } = useQuery<any[]>({
     queryKey: ["/api/exporters"],
+    queryFn: async () => {
+      const { storage } = await import('@/lib/storage');
+      return storage.getExporters();
+    },
   });
 
   const { data: importers } = useQuery<any[]>({
     queryKey: ["/api/importers"],
+    queryFn: async () => {
+      const { storage } = await import('@/lib/storage');
+      return storage.getImporters();
+    },
   });
 
   const { data: clients } = useQuery<any[]>({
     queryKey: ["/api/clients"],
+    queryFn: async () => {
+      const { storage } = await import('@/lib/storage');
+      return storage.getClients();
+    },
   });
 
   const { data: producers } = useQuery<any[]>({
     queryKey: ["/api/producers"],
+    queryFn: async () => {
+      const { storage } = await import('@/lib/storage');
+      return storage.getProducers();
+    },
   });
 
   const exportersList = useMemo(() => {
@@ -151,8 +167,8 @@ export default function OrderFormModal({ isOpen, onClose, order }: OrderFormModa
 
   const createOrderMutation = useMutation({
     mutationFn: async (data: InsertOrder) => {
-      const response = await apiRequest("POST", "/api/orders", data);
-      return response.json();
+      const { storage } = await import('@/lib/storage');
+      return storage.createOrder(data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["orders"] });
@@ -182,8 +198,8 @@ export default function OrderFormModal({ isOpen, onClose, order }: OrderFormModa
 
   const updateOrderMutation = useMutation({
     mutationFn: async (data: InsertOrder) => {
-      const response = await apiRequest("PUT", `/api/orders/${order!.id}`, data);
-      return response.json();
+      const { storage } = await import('@/lib/storage');
+      return storage.updateOrder(order!.id, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["orders"] });

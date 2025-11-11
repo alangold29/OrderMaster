@@ -46,11 +46,16 @@ export function UsersTable() {
 
   const { data: users, isLoading } = useQuery<CompanyUser[]>({
     queryKey: ["/api/company-users"],
+    queryFn: async () => {
+      const { storage } = await import('@/lib/storage');
+      return storage.getCompanyUsers();
+    },
   });
 
   const deleteUserMutation = useMutation({
     mutationFn: async (id: string) => {
-      return await apiRequest(`/api/company-users/${id}`, "DELETE");
+      const { storage } = await import('@/lib/storage');
+      return await storage.deleteCompanyUser(id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/company-users"] });
@@ -70,7 +75,8 @@ export function UsersTable() {
 
   const toggleActiveMutation = useMutation({
     mutationFn: async (id: string) => {
-      return await apiRequest(`/api/company-users/${id}/toggle-active`, "PATCH");
+      const { storage } = await import('@/lib/storage');
+      return await storage.toggleUserActive(id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/company-users"] });
@@ -90,7 +96,8 @@ export function UsersTable() {
 
   const updateRoleMutation = useMutation({
     mutationFn: async ({ id, role }: { id: string; role: string }) => {
-      return await apiRequest(`/api/company-users/${id}/role`, "PATCH", { role });
+      const { storage } = await import('@/lib/storage');
+      return await storage.updateUserRole(id, role);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/company-users"] });
