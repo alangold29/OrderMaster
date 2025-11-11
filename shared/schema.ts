@@ -1,89 +1,9 @@
-import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, decimal, integer, date, timestamp, boolean, jsonb } from "drizzle-orm/pg-core";
-import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
-
-export const clients = pgTable("clients", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  name: text("name").notNull().unique(),
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
-export const exporters = pgTable("exporters", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  name: text("name").notNull().unique(),
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
-export const importers = pgTable("importers", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  name: text("name").notNull().unique(),
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
-export const producers = pgTable("producers", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  name: text("name").notNull().unique(),
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
-export const orders = pgTable("orders", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  pedido: text("pedido").notNull().unique(),
-  data: date("data").notNull(),
-  exporterId: varchar("exporter_id").references(() => exporters.id).notNull(),
-  referenciaExportador: text("referencia_exportador"),
-  importerId: varchar("importer_id").references(() => importers.id).notNull(),
-  referenciaImportador: text("referencia_importador"),
-  quantidade: decimal("quantidade", { precision: 10, scale: 2 }).notNull(),
-  itens: text("itens"),
-  precoGuia: decimal("preco_guia", { precision: 10, scale: 2 }),
-  totalGuia: decimal("total_guia", { precision: 10, scale: 2 }),
-  producerId: varchar("producer_id").references(() => producers.id),
-  clientId: varchar("client_id").references(() => clients.id).notNull(),
-  etiqueta: text("etiqueta"),
-  portoEmbarque: text("porto_embarque"),
-  portoDestino: text("porto_destino"),
-  condicao: text("condicao"),
-  embarque: date("embarque"),
-  previsao: date("previsao"),
-  chegada: date("chegada"),
-  observacao: text("observacao"),
-  situacao: text("situacao").notNull().default("pendiente"),
-  semana: text("semana"),
-  moeda: text("moeda").notNull().default("BRL"),
-  viaTransporte: text("via_transporte"),
-  incoterm: text("incoterm"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
-
-export const insertClientSchema = createInsertSchema(clients).omit({
-  id: true,
-  createdAt: true,
-});
-
-export const insertExporterSchema = createInsertSchema(exporters).omit({
-  id: true,
-  createdAt: true,
-});
-
-export const insertImporterSchema = createInsertSchema(importers).omit({
-  id: true,
-  createdAt: true,
-});
-
-export const insertProducerSchema = createInsertSchema(producers).omit({
-  id: true,
-  createdAt: true,
-});
 
 const stringTransform = z.preprocess((val) => {
   if (val === null || val === undefined) return "";
   if (typeof val === 'number') {
-    // Check if it's a date serial number from Excel
     if (val > 40000 && val < 50000) {
-      // Convert Excel date serial to JavaScript date
       const date = new Date((val - 25569) * 86400 * 1000);
       return date.toISOString().split('T')[0];
     }
@@ -95,9 +15,7 @@ const stringTransform = z.preprocess((val) => {
 const optionalStringTransform = z.preprocess((val) => {
   if (val === null || val === undefined || val === "") return undefined;
   if (typeof val === 'number') {
-    // Check if it's a date serial number from Excel
     if (val > 40000 && val < 50000) {
-      // Convert Excel date serial to JavaScript date
       const date = new Date((val - 25569) * 86400 * 1000);
       return date.toISOString().split('T')[0];
     }
@@ -107,28 +25,45 @@ const optionalStringTransform = z.preprocess((val) => {
   return stringVal === "" ? undefined : stringVal;
 }, z.string().optional());
 
-export const insertOrderSchema = createInsertSchema(orders).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-  exporterId: true,
-  importerId: true,
-  clientId: true,
-  producerId: true,
-}).extend({
-  exporterName: z.string(),
-  importerName: z.string(),
-  clientName: z.string(),
-  producerName: z.string().optional(),
-  // Override numeric and date fields to accept any type and transform to strings
+export const insertClientSchema = z.object({
+  name: z.string().min(1, "Nome é obrigatório"),
+});
+
+export const insertExporterSchema = z.object({
+  name: z.string().min(1, "Nome é obrigatório"),
+});
+
+export const insertImporterSchema = z.object({
+  name: z.string().min(1, "Nome é obrigatório"),
+});
+
+export const insertProducerSchema = z.object({
+  name: z.string().min(1, "Nome é obrigatório"),
+});
+
+export const insertOrderSchema = z.object({
+  pedido: z.string().min(1, "Pedido é obrigatório"),
   data: stringTransform,
+  exporterName: z.string().min(1, "Exportador é obrigatório"),
+  importerName: z.string().min(1, "Importador é obrigatório"),
+  clientName: z.string().min(1, "Cliente é obrigatório"),
+  producerName: z.string().optional(),
+  referenciaExportador: z.string().optional(),
+  referenciaImportador: z.string().optional(),
   quantidade: stringTransform,
+  itens: z.string().optional(),
   precoGuia: optionalStringTransform,
   totalGuia: optionalStringTransform,
+  etiqueta: z.string().optional(),
+  portoEmbarque: z.string().optional(),
+  portoDestino: z.string().optional(),
+  condicao: z.string().optional(),
   embarque: optionalStringTransform,
   previsao: optionalStringTransform,
   chegada: optionalStringTransform,
-  dataEmissaoPedido: optionalStringTransform,
+  observacao: z.string().optional(),
+  situacao: z.string().default("pendiente"),
+  semana: z.string().optional(),
   moeda: z.enum(["BRL", "USD", "EUR"]).default("BRL"),
   viaTransporte: z.enum(["terrestre", "maritimo", "aereo"]).optional(),
   incoterm: z.enum(["CIF", "FOB", "FCA", "CFR"]).optional(),
@@ -136,12 +71,69 @@ export const insertOrderSchema = createInsertSchema(orders).omit({
 
 export const updateOrderSchema = insertOrderSchema.partial();
 
+export const insertCompanyUserSchema = z.object({
+  email: z.string().email("Email inválido"),
+  name: z.string().min(1, "Nome é obrigatório"),
+  position: z.string().min(1, "Posição é obrigatória"),
+  role: z.string().default("visualizador"),
+  permissions: z.record(z.boolean()).default({}),
+});
 
-export type Client = typeof clients.$inferSelect;
-export type Exporter = typeof exporters.$inferSelect;
-export type Importer = typeof importers.$inferSelect;
-export type Producer = typeof producers.$inferSelect;
-export type Order = typeof orders.$inferSelect;
+export type Client = {
+  id: string;
+  name: string;
+  created_at?: Date;
+};
+
+export type Exporter = {
+  id: string;
+  name: string;
+  created_at?: Date;
+};
+
+export type Importer = {
+  id: string;
+  name: string;
+  created_at?: Date;
+};
+
+export type Producer = {
+  id: string;
+  name: string;
+  created_at?: Date;
+};
+
+export type Order = {
+  id: string;
+  pedido: string;
+  data: string;
+  exporter_id: string;
+  referencia_exportador?: string;
+  importer_id: string;
+  referencia_importador?: string;
+  quantidade: string;
+  itens?: string;
+  preco_guia?: string;
+  total_guia?: string;
+  producer_id?: string;
+  client_id: string;
+  etiqueta?: string;
+  porto_embarque?: string;
+  porto_destino?: string;
+  condicao?: string;
+  embarque?: string;
+  previsao?: string;
+  chegada?: string;
+  observacao?: string;
+  situacao: string;
+  semana?: string;
+  moeda: string;
+  via_transporte?: string;
+  incoterm?: string;
+  created_at?: Date;
+  updated_at?: Date;
+};
+
 export type InsertClient = z.infer<typeof insertClientSchema>;
 export type InsertExporter = z.infer<typeof insertExporterSchema>;
 export type InsertImporter = z.infer<typeof insertImporterSchema>;
@@ -155,41 +147,27 @@ export type OrderWithRelations = Order & {
   producer?: Producer;
 };
 
-// Company Users Management System
-export const companyUsers = pgTable("company_users", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  email: varchar("email").notNull().unique(),
-  name: varchar("name").notNull(),
-  position: varchar("position").notNull(), // cargo/posição
-  role: varchar("role").notNull().default("visualizador"), // gerente, administrador, visualizador
-  isActive: boolean("is_active").default(true),
-  permissions: jsonb("permissions").default({}), // specific permissions object
-  lastLogin: timestamp("last_login"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
+export type CompanyUser = {
+  id: string;
+  email: string;
+  name: string;
+  position: string;
+  role: string;
+  is_active: boolean;
+  permissions: Record<string, boolean>;
+  last_login?: Date;
+  created_at?: Date;
+  updated_at?: Date;
+};
 
-// Zod schemas for company users
-export const insertCompanyUserSchema = createInsertSchema(companyUsers).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-  lastLogin: true,
-  isActive: true,
-});
-
-// Types
-export type CompanyUser = typeof companyUsers.$inferSelect;
 export type InsertCompanyUser = z.infer<typeof insertCompanyUserSchema>;
 
-// User Roles enum for reference (3 levels only)
 export const USER_ROLES = {
-  GERENTE: 'gerente',      // Full access - can do everything
-  ADMINISTRADOR: 'administrador',  // Limited editing - can edit but not delete
-  VISUALIZADOR: 'visualizador'     // Read only - can only view
+  GERENTE: 'gerente',
+  ADMINISTRADOR: 'administrador',
+  VISUALIZADOR: 'visualizador'
 } as const;
 
-// Permission structure for different areas
 export const PERMISSIONS = {
   ORDERS: {
     VIEW: 'orders:view',
