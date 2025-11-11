@@ -15,5 +15,15 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist"),
     emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'xlsx-vendor': ['xlsx'],
+          'react-vendor': ['react', 'react-dom', 'react-hook-form'],
+          'ui-vendor': ['@radix-ui/react-dialog', '@radix-ui/react-select', '@radix-ui/react-toast'],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 600,
   },
 });
